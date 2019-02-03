@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PaintScene : MonoBehaviour {
-    [SerializeField] private GameObject display;
     [SerializeField] private GameObject backButton;
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
@@ -35,6 +34,7 @@ public class PaintScene : MonoBehaviour {
     }
 
     private void showScreenShot() {
+        DisplayImage(path);
         DisplayImage(path);
         myCanvas.enabled = true;
     }
