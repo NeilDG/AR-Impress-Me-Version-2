@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PaintScene : MonoBehaviour {
+    [SerializeField] private Material paint;
+    [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
@@ -29,13 +31,20 @@ public class PaintScene : MonoBehaviour {
     }
 
     private void screenShot() {
-        path = Application.persistentDataPath + "/UnalteredScene.png";
+        Debug.Log(Application.persistentDataPath);
+        //path = Application.persistentDataPath + "/UnalteredScene.png";
+        path = "D:/School/GAME/AR-Impress-Me/UnalteredScene.png";
         ScreenCapture.CaptureScreenshot("UnalteredScene.png");
     }
 
     private void showScreenShot() {
         DisplayImage(path);
-        DisplayImage(path);
+        //DisplayImage(path);
+        paint.SetTexture(1, screenshot.texture);
+        image.material = paint;
+        image.enabled = true;
+        paintButton.SetActive(false);
+        backButton.SetActive(true);
         myCanvas.enabled = true;
     }
 
@@ -46,14 +55,13 @@ public class PaintScene : MonoBehaviour {
             texture.LoadImage(bytes);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
-            image.enabled = true;
             screenshot = sprite;
-            backButton.SetActive(true);
         }
     }
 
     public void back() {
         image.enabled = false;
         backButton.SetActive(false);
+        paintButton.SetActive(true);
     }
 }
