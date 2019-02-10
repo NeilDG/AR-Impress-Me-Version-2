@@ -34,3 +34,9 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+ProjectSettings/EditorBuildSettings.asset
+*.asset
+ProjectSettings/EditorBuildSettings.asset
+ProjectSettings/ProjectVersion.txt
+ProjectSettings/VFXManager.asset
+QCAR/somedata16
