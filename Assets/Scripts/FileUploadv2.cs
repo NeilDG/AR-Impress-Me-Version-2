@@ -8,7 +8,7 @@ public class FileUploadv2 : MonoBehaviour
 {
 
     //private string m_LocalFileName = "C:/boot.ini";
-    private string m_URL = "http://192.168.178.29/";
+    private string m_URL = "http://127.0.0.1/";
     private string m_LocalFileName = "C:/Users/Jordan/Desktop/chika pouting.png";
     //private string m_URL = "http://127.0.0.1/";
 

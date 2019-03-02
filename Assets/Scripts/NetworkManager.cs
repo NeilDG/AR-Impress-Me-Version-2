@@ -3,33 +3,18 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Collections;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : NetworkBehaviour
 {
     public bool isAtStartup = true;
     NetworkClient myClient;
     public Button Host;
 
-    private string m_URL = "http://192.168.178.29/";
+    private string m_URL = "http://127.0.0.1/";
     private string m_LocalFileName = "C:/Users/Jordan/Desktop/chika pouting.png";
 
     void Update()
     {
-        if (isAtStartup)
-        {
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                SetupServer();
-            }
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                SetupClient();
-            }
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                SetupServer();
-                SetupLocalClient();
-            }
-        }
+        
     }
     void OnGUI()
     {
@@ -60,7 +45,7 @@ public class NetworkManager : MonoBehaviour
         myClient = new NetworkClient();
         myClient.RegisterHandler(MsgType.Connect, OnConnected);
         //myClient.Connect("127.0.0.1", 4444);
-        myClient.Connect("192.168.178.29", 4444);
+        myClient.Connect("127.0.0.1", 4444);
         isAtStartup = false;
     }
 
