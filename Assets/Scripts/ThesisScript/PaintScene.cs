@@ -12,6 +12,7 @@ public class PaintScene : MonoBehaviour {
     private Sprite screenshot;
     private int screenCount = 4;
     private string path;
+    private byte[] sendBytes;
 
     // Use this for initialization
     void Start () {
@@ -25,9 +26,10 @@ public class PaintScene : MonoBehaviour {
     }
 
     public void Paint() {
-        myCanvas.enabled = false;
-        Invoke("screenShot", 1f);
-        Invoke("showScreenShot", 2f);
+        //myCanvas.enabled = false;
+        //Invoke("screenShot", 1f);
+        screenShot();
+        //Invoke("showScreenShot", 2f);
     }
 
     private void screenShot() {
@@ -35,6 +37,8 @@ public class PaintScene : MonoBehaviour {
         //path = Application.persistentDataPath + "/UnalteredScene.png";
         path = "D:/School/GAME/AR-Impress-Me/UnalteredScene.png";
         ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+
+        Texture2D GG = ScreenCapture.CaptureScreenshotAsTexture();
     }
 
     private void showScreenShot() {
@@ -51,12 +55,18 @@ public class PaintScene : MonoBehaviour {
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
             byte[] bytes = System.IO.File.ReadAllBytes(path);
+            sendBytes = bytes;
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
             screenshot = sprite;
         }
+    }
+
+    public byte[] SendBytes()
+    {
+        return sendBytes;
     }
 
     public void back() {
