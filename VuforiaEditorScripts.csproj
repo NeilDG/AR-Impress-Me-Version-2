@@ -10,7 +10,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>
     </RootNamespace>
-    <ProjectGuid>{8E4DFCBB-E23F-877E-A05B-5E8C062CF9E7}</ProjectGuid>
+    <ProjectGuid>{6147D427-8D82-AAC3-137A-D698EEA3C161}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>VuforiaEditorScripts</AssemblyName>
@@ -306,52 +306,52 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/DOTween/DOTween.dll</HintPath>
     </Reference>
     <Reference Include="DOTween43">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween43.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/DOTween/DOTween43.dll</HintPath>
     </Reference>
     <Reference Include="DOTween46">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween46.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/DOTween/DOTween46.dll</HintPath>
     </Reference>
     <Reference Include="DOTween50">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween50.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/DOTween/DOTween50.dll</HintPath>
     </Reference>
     <Reference Include="DOTweenEditor">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/Editor/DOTweenEditor.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/DOTween/Editor/DOTweenEditor.dll</HintPath>
     </Reference>
     <Reference Include="ProBuilderCore-Unity5">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
     </Reference>
     <Reference Include="ProBuilderMeshOps-Unity5">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
     </Reference>
     <Reference Include="KdTreeLib">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
     </Reference>
     <Reference Include="pb_Stl">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
     </Reference>
     <Reference Include="Poly2Tri">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
     </Reference>
     <Reference Include="ProBuilderEditor-Unity5">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/ProCore/ProBuilder/Editor/ProBuilderEditor-Unity5.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Assets/ProCore/ProBuilder/Editor/ProBuilderEditor-Unity5.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Advertisements">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Purchasing">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Library/PackageCache/com.unity.purchasing@2.0.3/Editor/UnityEditor.Purchasing.dll</HintPath>
+      <HintPath>D:/School/GAME/AR-Impress-Me-Jordz/Library/PackageCache/com.unity.purchasing@2.0.3/Editor/UnityEditor.Purchasing.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.8f1/Editor/Data/MonoBleedingEdge/lib/mono/2.0-api/mscorlib.dll</HintPath>
@@ -383,7 +383,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="VuforiaScripts.csproj">
-      <Project>{4985BFD8-C42A-560B-F85F-56FC522B5120}</Project>
+      <Project>{8703AE87-7D46-5464-9A23-5843464D8B2C}</Project>
       <Name>VuforiaScripts</Name>
     </ProjectReference>
   </ItemGroup>
