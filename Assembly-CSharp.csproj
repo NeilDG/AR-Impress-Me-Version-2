@@ -87,7 +87,7 @@
     <Compile Include="Assets\Scripts\ScreenshotHandler.cs" />
     <Compile Include="Assets\Scripts\TCPClient.cs" />
     <Compile Include="Assets\Scripts\TCPServer.cs" />
-    <Compile Include="Assets\Scripts\ThesisScript\AddObject.cs" />
+    <Compile Include="Assets\Scripts\ThesisScript\ObjectManipulation.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\PaintScene.cs" />
     <Compile Include="Assets\Scripts\UI Optimization\HidingScrollView.cs" />
     <Compile Include="Assets\Scripts\UI Optimization\ScrollableBounds.cs" />
