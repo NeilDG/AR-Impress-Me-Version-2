@@ -5,19 +5,30 @@ using UnityEngine.UI;
 
 public class ObjectManipulation : MonoBehaviour
 {
+    [SerializeField] Camera arcamera;
+    [SerializeField] GameObject imagetarget;
+
     [SerializeField] private GameObject model1;
     [SerializeField] private GameObject model2;
     [SerializeField] private GameObject model3;
 
-    [SerializeField] private Text MButton1;
-    [SerializeField] private Text MButton2;
-    [SerializeField] private Text MButton3;
+    [SerializeField] private GameObject MButt1;
+    [SerializeField] private GameObject MButt2;
+    [SerializeField] private GameObject MButt3;
+
+    [SerializeField] private Text MText1;
+    [SerializeField] private Text MText2;
+    [SerializeField] private Text MText3;
 
     [SerializeField] private GameObject xArrow;
     [SerializeField] private GameObject yArrow;
     [SerializeField] private GameObject zArrow;
 
-    private string current;
+
+
+    private string current = "";
+    private string cTransform = "";
+    private Transform cGameTransform;
 
     // Start is called before the first frame update
     void Start()
@@ -32,54 +43,92 @@ public class ObjectManipulation : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit)) {
-                if (hit.transform.name.Equals(current)) {
-                    Debug.Log("gottem");
-                } else {
+                if (!hit.transform.name.Equals(current)) {
+                    reset();
+                    cGameTransform = hit.transform;
                     current = hit.transform.name;
+
+                    MButt1.SetActive(false);
+                    MButt2.SetActive(false);
+                    MButt3.SetActive(false);
+
                     xArrow.SetActive(true);
                     yArrow.SetActive(true);
                     zArrow.SetActive(true);
-                    xArrow.transform.localPosition = hit.transform.localPosition;
-                    yArrow.transform.localPosition = hit.transform.localPosition;
-                    zArrow.transform.localPosition = hit.transform.localPosition;
+                    
+                    cGameTransform.parent = arcamera.transform;
+                    xArrow.transform.parent = arcamera.transform;
+                    xArrow.transform.localPosition = cGameTransform.localPosition;
+                    yArrow.transform.parent = arcamera.transform;
+                    yArrow.transform.localPosition = cGameTransform.localPosition;
+                    zArrow.transform.parent = arcamera.transform;
+                    zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
-                current = "";
-                xArrow.SetActive(false);
-                yArrow.SetActive(false);
-                zArrow.SetActive(false);
+                reset();
             }
         }
     }
 
+    public void reset() {
+        current = "";
+        cTransform = "";
+        MButt1.SetActive(true);
+        MButt2.SetActive(true);
+        MButt3.SetActive(true);
+
+        xArrow.SetActive(false);
+        yArrow.SetActive(false);
+        zArrow.SetActive(false);
+
+        xArrow.transform.parent = imagetarget.transform;
+        yArrow.transform.parent = imagetarget.transform;
+        zArrow.transform.parent = imagetarget.transform;
+
+        if(cGameTransform != null)
+            cGameTransform.parent = imagetarget.transform;
+    }
+
+    public void moveByX() {
+        cTransform = "x";
+    }
+
+    public void moveByY() {
+        cTransform = "y";
+    }
+
+    public void moveByZ() {
+        cTransform = "z";
+    }
+
     public void activate1() {
-        if(MButton1.text.Equals("+Sword")) {
-            MButton1.text = "-Sword";
+        if(MText1.text.Equals("+Sword")) {
+            MText1.text = "-Sword";
             model1.SetActive(true);
         } else {
-            MButton1.text = "+Sword";
+            MText1.text = "+Sword";
             model1.SetActive(false);
         }
     }
 
     public void activate2() {
-        if (MButton2.text.Equals("+AK47")) {
-            MButton2.text = "-AK47";
+        if (MText2.text.Equals("+AK47")) {
+            MText2.text = "-AK47";
             model2.SetActive(true);
         }
         else {
-            MButton2.text = "+AK47";
+            MText2.text = "+AK47";
             model2.SetActive(false);
         }
     }
 
     public void activate3() {
-        if (MButton3.text.Equals("+Dragon")) {
-            MButton3.text = "-Dragon";
+        if (MText3.text.Equals("+Dragon")) {
+            MText3.text = "-Dragon";
             model3.SetActive(true);
         }
         else {
-            MButton3.text = "+Dragon";
+            MText3.text = "+Dragon";
             model3.SetActive(false);
         }
     }
