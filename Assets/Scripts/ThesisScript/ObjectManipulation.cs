@@ -57,11 +57,8 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.SetActive(true);
                     
                     cGameTransform.parent = arcamera.transform;
-                    xArrow.transform.parent = arcamera.transform;
                     xArrow.transform.localPosition = cGameTransform.localPosition;
-                    yArrow.transform.parent = arcamera.transform;
                     yArrow.transform.localPosition = cGameTransform.localPosition;
-                    zArrow.transform.parent = arcamera.transform;
                     zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
@@ -80,10 +77,6 @@ public class ObjectManipulation : MonoBehaviour
         xArrow.SetActive(false);
         yArrow.SetActive(false);
         zArrow.SetActive(false);
-
-        xArrow.transform.parent = imagetarget.transform;
-        yArrow.transform.parent = imagetarget.transform;
-        zArrow.transform.parent = imagetarget.transform;
 
         if(cGameTransform != null)
             cGameTransform.parent = imagetarget.transform;
