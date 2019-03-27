@@ -370,6 +370,24 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="AWSSDK.CognitoIdentity">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.CognitoSync">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.Core">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.Lambda">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.Lambda.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.S3">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.SecurityToken">
+      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
+    </Reference>
     <Reference Include="DOTween">
       <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween.dll</HintPath>
     </Reference>
@@ -447,17 +465,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{6BCD8DDB-EFEC-D022-F74C-4986F53F0CB4}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{8ED25EC5-8001-890F-0CFA-B8952F4F5360}</Project>
       <Name>Assembly-CSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj">
-      <Project>{DF5B8C01-AA5D-4C52-030E-7E0B0585B3B1}</Project>
-      <Name>Assembly-CSharp-Editor-firstpass</Name>
     </ProjectReference>
     <ProjectReference Include="VuforiaScripts.csproj">
       <Project>{4985BFD8-C42A-560B-F85F-56FC522B5120}</Project>

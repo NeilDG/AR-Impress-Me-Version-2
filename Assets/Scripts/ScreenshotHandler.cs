@@ -4,55 +4,72 @@ using UnityEngine;
 
 public class ScreenshotHandler : MonoBehaviour
 {
-    private static ScreenshotHandler instance;
 
-    private Camera myCamera;
-    private bool takeScreenshotNextFrame;
-    private static byte[] screen_bytes;
+    [SerializeField] private GameObject SwordButton;
+    [SerializeField] private GameObject AK47Button;
+    [SerializeField] private GameObject DragonButton;
 
-    private void Awake()
+    [SerializeField] private GameObject ScreenShotButton;
+
+    public void Start()
     {
-        Debug.Log("AWAKE");
-        instance = this;
-        //myCamera = gameObject.GetComponent<Camera>();
-        myCamera = Camera.main;
+
     }
-
-    private void OnPostRender()
-    {
-        if (takeScreenshotNextFrame)
-        {
-            takeScreenshotNextFrame = false;
-            RenderTexture renderTexture = myCamera.targetTexture;
-
-            Texture2D renderResult = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, false);
-            Rect rect = new Rect(0, 0, renderTexture.width, renderTexture.height);
-            renderResult.ReadPixels(rect, 0, 0);
-
-            byte[] byteArray = renderResult.EncodeToPNG();
-            System.IO.File.WriteAllBytes(Application.dataPath + "/CameraScreenshot.png", byteArray);
-            Debug.Log("Saved ScreenShot!!");
-
-            screen_bytes = byteArray;   
-
-            RenderTexture.ReleaseTemporary(renderTexture);
-            myCamera.targetTexture = null;
-
-        }
-    }
-
-    private void TakeScreenShot(int width, int height)
-    {
-        myCamera.targetTexture = RenderTexture.GetTemporary(width, height, 16);
-        takeScreenshotNextFrame = true;
-        OnPostRender();
-    }
-
-    public static byte[] TakeScreenshot_Static(int width, int height)
+    public void Update()
     {
         
-        instance.TakeScreenShot(width, height);
-        return screen_bytes;
     }
+
+    public void TakeShot()
+    {
+        Debug.Log("Crush");
+        TakeScreenShot();
+    }
+
+    public void TakeScreenShot()
+    {
+
+        Texture2D tex = new Texture2D(16, 16, TextureFormat.PVRTC_RGBA4, false);
+
+        returnButtons();
+    
+
+        byte[] image_bytes = null;
+        Texture2D print_screen = ScreenCapture.CaptureScreenshotAsTexture();
+
+        image_bytes = print_screen.EncodeToPNG();
+
+        if (image_bytes == null)
+        {
+            Debug.Log("FUCK");
+        } else
+        {
+            Debug.Log("SHOT TAKEN");
+        }
+
+        tex.LoadRawTextureData(image_bytes);
+        tex.Apply();
+
+
+
+        returnButtons();
+
+    }
+
+    private void removeButtons()
+    {
+        SwordButton.SetActive(false);
+        AK47Button.SetActive(false);
+        DragonButton.SetActive(false);
+    }
+
+    private void returnButtons()
+    {
+        SwordButton.SetActive(true);
+        AK47Button.SetActive(true);
+        DragonButton.SetActive(true);
+    }
+
+
 
 }
