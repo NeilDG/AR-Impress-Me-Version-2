@@ -28,7 +28,6 @@
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <LangVersion>7.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +37,6 @@
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <LangVersion>7.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -76,11 +74,11 @@
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Procedural Mesh\ExtrudeRandomEdges.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Runtime Editing\RuntimeEdit.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Vertex Colors\HighlightNearestFace.cs" />
+    <Compile Include="Assets\Scripts\AWSFileHandler.cs" />
     <Compile Include="Assets\Scripts\Broadcasting\EventBroadcaster.cs" />
     <Compile Include="Assets\Scripts\Broadcasting\EventNames.cs" />
     <Compile Include="Assets\Scripts\Broadcasting\ObserverList.cs" />
     <Compile Include="Assets\Scripts\Broadcasting\Parameters.cs" />
-    <Compile Include="Assets\Scripts\FileUploadv2.cs" />
     <Compile Include="Assets\Scripts\LambdaExample.cs" />
     <Compile Include="Assets\Scripts\LoadManager\LoadManager.cs" />
     <Compile Include="Assets\Scripts\LoadManager\SceneNames.cs" />
@@ -89,10 +87,11 @@
     <Compile Include="Assets\Scripts\Pooling\APoolable.cs" />
     <Compile Include="Assets\Scripts\Pooling\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\Scrap\FileRetriever.cs" />
+    <Compile Include="Assets\Scripts\Scrap\FileUploadv2.cs" />
     <Compile Include="Assets\Scripts\Scrap\NetworkManager.cs" />
+    <Compile Include="Assets\Scripts\Scrap\TCPClient.cs" />
+    <Compile Include="Assets\Scripts\Scrap\TCPServer.cs" />
     <Compile Include="Assets\Scripts\ScreenshotHandler.cs" />
-    <Compile Include="Assets\Scripts\TCPClient.cs" />
-    <Compile Include="Assets\Scripts\TCPServer.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\FileUpload.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\ObjectManipulation.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\PaintScene.cs" />

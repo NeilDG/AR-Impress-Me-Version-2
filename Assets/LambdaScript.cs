@@ -14,7 +14,7 @@ public class LambdaScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        UnityInitializer.AttachToGameObject(this.gameObject);
+        UnityInitializer.AttachToGameObject(this.gameObject);   
 
         AWSConfigs.HttpClient = AWSConfigs.HttpClientOption.UnityWebRequest;
 
