@@ -32,9 +32,10 @@ public class PaintScene : MonoBehaviour {
         //Invoke("showScreenShot", 2f);
     }
 
-    public void screenShot() {
+    private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         //path = Application.persistentDataPath + "/UnalteredScene.png";
+        path = "D:/School/GAME/AR-Impress-Me/UnalteredScene.png";
         ScreenCapture.CaptureScreenshot("UnalteredScene.png");
 
         Texture2D GG = ScreenCapture.CaptureScreenshotAsTexture();
