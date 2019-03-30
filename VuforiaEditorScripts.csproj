@@ -305,24 +305,6 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
-    <Reference Include="AWSSDK.CognitoIdentity">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.CognitoSync">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.Core">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.Lambda">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.Lambda.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.S3">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.SecurityToken">
-      <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
-    </Reference>
     <Reference Include="DOTween">
       <HintPath>D:/College/THESIS/AR-Impress-Me/Assets/DOTween/DOTween.dll</HintPath>
     </Reference>
