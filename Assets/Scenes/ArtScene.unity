@@ -634,7 +634,7 @@ MonoBehaviour:
   mAspectRatio: 0.69950247
   mImageTargetType: 0
   mWidth: 25
-  mHeight: 17.522432
+  mHeight: 17.487562
 --- !u!4 &773190235
 Transform:
   m_ObjectHideFlags: 0
@@ -688,7 +688,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -16, y: -174}
+  m_AnchoredPosition: {x: -16, y: -578}
   m_SizeDelta: {x: 100, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1203465399
