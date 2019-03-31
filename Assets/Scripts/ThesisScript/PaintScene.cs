@@ -26,8 +26,8 @@ public class PaintScene : MonoBehaviour {
 
     public void Paint() {
         myCanvas.enabled = false;
-        Invoke("screenShot", 1f);
-        Invoke("showScreenShot", 2f);
+        Invoke("screenShot", 0.1f);
+        Invoke("showScreenShot", 0.2f);
     }
 
     private void screenShot() {
