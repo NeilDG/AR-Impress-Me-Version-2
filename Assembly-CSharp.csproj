@@ -92,6 +92,7 @@
     <None Include="Assets\Vuforia\Shaders\VertexLitWithZ.shader" />
     <None Include="Assets\DOTween\DOTween43.xml" />
     <None Include="Assets\DOTween\DOTween46.xml" />
+    <None Include="Assets\Shader\Test.shader" />
     <None Include="Assets\Vuforia\Shaders\VideoBackground.shader" />
     <None Include="Assets\Shader\OilPainting.shader" />
     <None Include="Assets\Vuforia\Shaders\OutlineOpaque.shader" />
