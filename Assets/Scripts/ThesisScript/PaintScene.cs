@@ -38,8 +38,8 @@ public class PaintScene : MonoBehaviour {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
         //path = "D:/School/GAME/AR-Impress-Me/UnalteredScene.png";
-        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        ScreenCapture.CaptureScreenshot(path);
+        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        //ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
