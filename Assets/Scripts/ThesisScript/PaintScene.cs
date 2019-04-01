@@ -5,6 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PaintScene : MonoBehaviour {
+
+    [SerializeField] private ObjectManipulation objectMan;
+    [SerializeField] private GameObject but1;
+    [SerializeField] private GameObject but2;
+    [SerializeField] private GameObject but3;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
     [SerializeField] private Image image;
@@ -28,18 +33,22 @@ public class PaintScene : MonoBehaviour {
     }
 
     private IEnumerator Paint() {
+        objectMan.reset();
         myCanvas.enabled = false;
         screenShot();
         yield return new WaitUntil(() => File.Exists(path) == true);
         showScreenShot();
+        but1.SetActive(false);
+        but2.SetActive(false);
+        but3.SetActive(false);
     }
 
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
         //path = "D:/School/GAME/AR-Impress-Me/UnalteredScene.png";
-        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        //ScreenCapture.CaptureScreenshot(path);
+        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
@@ -71,5 +80,8 @@ public class PaintScene : MonoBehaviour {
         image.enabled = false;
         backButton.SetActive(false);
         paintButton.SetActive(true);
+        but1.SetActive(true);
+        but2.SetActive(true);
+        but3.SetActive(true);
     }
 }
