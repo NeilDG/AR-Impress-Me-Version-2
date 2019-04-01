@@ -7,15 +7,12 @@ using UnityEngine.UI;
 public class PaintScene : MonoBehaviour {
 
     [SerializeField] private ObjectManipulation objectMan;
-    [SerializeField] private GameObject but1;
-    [SerializeField] private GameObject but2;
-    [SerializeField] private GameObject but3;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
     private Sprite screenshot;
-    private string path;
+    private string path = "";
 
     // Use this for initialization
     void Start () {
@@ -38,9 +35,7 @@ public class PaintScene : MonoBehaviour {
         screenShot();
         yield return new WaitUntil(() => File.Exists(path) == true);
         showScreenShot();
-        but1.SetActive(false);
-        but2.SetActive(false);
-        but3.SetActive(false);
+        objectMan.turnOffAddButton();
     }
 
     private void screenShot() {
@@ -53,35 +48,31 @@ public class PaintScene : MonoBehaviour {
     }
 
     private void showScreenShot() {
-        Debug.Log("1");
         DisplayImage(path);
         image.enabled = true;
         paintButton.SetActive(false);
         backButton.SetActive(true);
         myCanvas.enabled = true;
-        Debug.Log("2");
     }
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            Debug.Log("3");
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
             screenshot = sprite;
-            Debug.Log("4");
         }
     }
 
     public void back() {
-        File.Delete(path);
+        if(!path.Equals(""))
+            File.Delete(path);
+        path = "";
         image.enabled = false;
         backButton.SetActive(false);
         paintButton.SetActive(true);
-        but1.SetActive(true);
-        but2.SetActive(true);
-        but3.SetActive(true);
+        objectMan.reset();
     }
 }

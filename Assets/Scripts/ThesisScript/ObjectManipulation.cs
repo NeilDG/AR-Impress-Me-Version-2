@@ -1,39 +1,53 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class ObjectManipulation : MonoBehaviour
 {
     [SerializeField] Camera arcamera;
     [SerializeField] GameObject imagetarget;
 
-    [SerializeField] private GameObject model1;
-    [SerializeField] private GameObject model2;
-    [SerializeField] private GameObject model3;
+    [SerializeField] private GameObject[] models;
+    [SerializeField] private List<GameObject> buttons = new List<GameObject>();
 
-    [SerializeField] private GameObject MButt1;
-    [SerializeField] private GameObject MButt2;
-    [SerializeField] private GameObject MButt3;
+    [SerializeField] private GameObject templateB;
+    [SerializeField] private Text templateT;
 
-    [SerializeField] private Text MText1;
-    [SerializeField] private Text MText2;
-    [SerializeField] private Text MText3;
+    [SerializeField] private GameObject AddButton;
+    [SerializeField] private GameObject RemoveButton;
+
+    [SerializeField] private GameObject paintButton;
+    [SerializeField] private GameObject backButton;
+
+    [SerializeField] private GameObject scrollView;
+    [SerializeField] private GameObject contents;
 
     [SerializeField] private GameObject xArrow;
     [SerializeField] private GameObject yArrow;
     [SerializeField] private GameObject zArrow;
-
-
-
+    
     private string current = "";
-    private string cTransform = "";
     private Transform cGameTransform;
+    private GameObject cGameObject;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        for(int x = 0; x < models.Length; x++) {
+            templateB.name = models[x].name;
+            templateT.text = models[x].name;
+            
+            GameObject newButton = Instantiate(templateB);
+            newButton.transform.parent = contents.transform;
+            newButton.transform.localPosition = templateB.transform.localPosition;
+            newButton.transform.localScale = templateB.transform.localScale;
 
+            newButton.SetActive(true);
+        }
     }
 
     // Update is called once per frame
@@ -43,14 +57,13 @@ public class ObjectManipulation : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit)) {
-                if (!hit.transform.name.Equals(current)) {
+                if (!hit.transform.name.Equals(current) && !scrollView.active) {
                     reset();
                     cGameTransform = hit.transform;
                     current = hit.transform.name;
 
-                    MButt1.SetActive(false);
-                    MButt2.SetActive(false);
-                    MButt3.SetActive(false);
+                    AddButton.SetActive(false);
+                    RemoveButton.SetActive(true);
 
                     xArrow.SetActive(true);
                     yArrow.SetActive(true);
@@ -62,17 +75,53 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
-                reset();
+                if(!scrollView.active)
+                    reset();
             }
         }
     }
 
+    public void turnOffAddButton() {
+        AddButton.SetActive(false);
+
+    }
+
+    public void activate() {
+        string name = EventSystem.current.currentSelectedGameObject.name;
+        for(int x = 0; x < models.Length; x++) {
+            if (name.Contains(models[x].name)) {
+                models[x].SetActive(true);
+                models[x].transform.localPosition = new Vector3(0, 0, 0);
+                models[x].transform.localRotation = new Quaternion();
+            }
+        }
+        backButton.SetActive(false);
+        paintButton.SetActive(true);
+        reset();
+    }
+
+    public void AddModel() {
+        AddButton.SetActive(false);
+        paintButton.SetActive(false);
+        backButton.SetActive(true);
+        scrollView.SetActive(true);
+        
+    }
+
+    public void removeModel() {
+        for (int x = 0; x < models.Length; x++) {
+            if (cGameTransform.name.Contains(models[x].name)) {
+                models[x].SetActive(false);
+            }
+        }
+        reset();
+    }
+
     public void reset() {
         current = "";
-        cTransform = "";
-        MButt1.SetActive(true);
-        MButt2.SetActive(true);
-        MButt3.SetActive(true);
+        scrollView.SetActive(false);
+        AddButton.SetActive(true);
+        RemoveButton.SetActive(false);
 
         xArrow.SetActive(false);
         yArrow.SetActive(false);
@@ -81,48 +130,5 @@ public class ObjectManipulation : MonoBehaviour
         if(cGameTransform != null)
             cGameTransform.parent = imagetarget.transform;
     }
-
-    public void moveByX() {
-        cTransform = "x";
-    }
-
-    public void moveByY() {
-        cTransform = "y";
-    }
-
-    public void moveByZ() {
-        cTransform = "z";
-    }
-
-    public void activate1() {
-        if(MText1.text.Equals("+Sword")) {
-            MText1.text = "-Sword";
-            model1.SetActive(true);
-        } else {
-            MText1.text = "+Sword";
-            model1.SetActive(false);
-        }
-    }
-
-    public void activate2() {
-        if (MText2.text.Equals("+AK47")) {
-            MText2.text = "-AK47";
-            model2.SetActive(true);
-        }
-        else {
-            MText2.text = "+AK47";
-            model2.SetActive(false);
-        }
-    }
-
-    public void activate3() {
-        if (MText3.text.Equals("+Dragon")) {
-            MText3.text = "-Dragon";
-            model3.SetActive(true);
-        }
-        else {
-            MText3.text = "+Dragon";
-            model3.SetActive(false);
-        }
-    }
+    
 }
