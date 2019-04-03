@@ -54,7 +54,7 @@ public class ObjectManipulation : MonoBehaviour
     void Update() {
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var ray = arcamera.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit)) {
                 if (!hit.transform.name.Equals(current) && !scrollView.active) {
@@ -75,7 +75,7 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
-                if(!scrollView.active)
+                if(!scrollView.active && !backButton.active)
                     reset();
             }
         }
@@ -109,6 +109,7 @@ public class ObjectManipulation : MonoBehaviour
     }
 
     public void removeModel() {
+        Debug.Log("in");
         for (int x = 0; x < models.Length; x++) {
             if (cGameTransform.name.Contains(models[x].name)) {
                 models[x].SetActive(false);

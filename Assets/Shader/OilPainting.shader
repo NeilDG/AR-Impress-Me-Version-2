@@ -5,7 +5,7 @@ Shader "Custom/OilPainting"
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_Radius("Radius", Range(0, 10)) = 0
+		_Radius("Radius", Range(0, 15)) = 0
 	}
 		SubShader
 		{
