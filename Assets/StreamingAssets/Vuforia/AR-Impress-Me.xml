@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
-  <Tracking>
-    <ImageTarget name="Chips" size="25.000000 17.522432" />
-    <ImageTarget name="Stones" size="25.000000 17.487562" />
-    <ImageTarget name="Tarmac" size="25.000000 17.572283" />
-  </Tracking>
+<QCARConfig>
+    <Tracking>
+        <ImageTarget name="PorousStone" size="1.000000 0.664062"/>
+        <ImageTarget name="Tarmac" size="1.000000 0.702891"/>
+        <ImageTarget name="Stones" size="1.000000 0.699502"/>
+        <ImageTarget name="Chips" size="1.000000 0.700897"/>
+        <ImageTarget name="Diabo-Box.Left" size="3.910000 21.859999"/>
+        <ImageTarget name="Diabo-Box.Back" size="15.190000 21.860001"/>
+        <ImageTarget name="Diabo-Box.Front" size="15.190000 21.860001"/>
+        <ImageTarget name="Diabo-Box.Bottom" size="15.190000 3.910000"/>
+        <ImageTarget name="Diabo-Box.Right" size="3.910000 21.859999"/>
+        <ImageTarget name="Diabo-Box.Top" size="15.190000 3.910000"/>
+        <MultiTarget name="Diablo-Box">
+            <Part name="Diabo-Box.Left" translation="-7.59499979019165 0 0" rotation="AD: 0 1 0 -90"/>
+            <Part name="Diabo-Box.Right" translation="7.59499979019165 0 0" rotation="AD: 0 1 0 90"/>
+            <Part name="Diabo-Box.Front" translation="0 0 1.9550000429153442" rotation="AD: 1 0 0 0"/>
+            <Part name="Diabo-Box.Back" translation="0 0 -1.9550000429153442" rotation="AD: 0 1 0 180"/>
+            <Part name="Diabo-Box.Top" translation="0 10.930000305175781 0" rotation="AD: 1 0 0 -90"/>
+            <Part name="Diabo-Box.Bottom" translation="0 -10.930000305175781 0" rotation="AD: 1 0 0 90"/>
+        </MultiTarget>
+    </Tracking>
 </QCARConfig>

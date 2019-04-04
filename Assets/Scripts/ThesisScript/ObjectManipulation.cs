@@ -75,7 +75,7 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
-                if(!scrollView.active && !backButton.active)
+                if(!scrollView.active && !backButton.active) 
                     reset();
             }
         }
@@ -83,7 +83,6 @@ public class ObjectManipulation : MonoBehaviour
 
     public void turnOffAddButton() {
         AddButton.SetActive(false);
-
     }
 
     public void activate() {
@@ -101,6 +100,7 @@ public class ObjectManipulation : MonoBehaviour
     }
 
     public void AddModel() {
+        Debug.Log("Adding...");
         AddButton.SetActive(false);
         paintButton.SetActive(false);
         backButton.SetActive(true);
@@ -108,10 +108,11 @@ public class ObjectManipulation : MonoBehaviour
         
     }
 
-    public void removeModel() {
+    public void RemoveModel() {
         Debug.Log("in");
         for (int x = 0; x < models.Length; x++) {
             if (cGameTransform.name.Contains(models[x].name)) {
+                //Debug.Log(cGameTransform.name);
                 models[x].SetActive(false);
             }
         }
