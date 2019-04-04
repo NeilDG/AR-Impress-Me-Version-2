@@ -35,7 +35,6 @@ public class PaintScene : MonoBehaviour {
         screenShot();
         yield return new WaitUntil(() => File.Exists(path) == true);
         showScreenShot();
-        objectMan.turnOffAddButton();
     }
 
     private void screenShot() {

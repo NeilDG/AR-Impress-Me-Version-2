@@ -16,9 +16,6 @@ public class ObjectManipulation : MonoBehaviour
     [SerializeField] private GameObject templateB;
     [SerializeField] private Text templateT;
 
-    [SerializeField] private GameObject AddButton;
-    [SerializeField] private GameObject RemoveButton;
-
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
 
@@ -61,9 +58,7 @@ public class ObjectManipulation : MonoBehaviour
                     reset();
                     cGameTransform = hit.transform;
                     current = hit.transform.name;
-
-                    AddButton.SetActive(false);
-                    RemoveButton.SetActive(true);
+                    
 
                     xArrow.SetActive(true);
                     yArrow.SetActive(true);
@@ -80,10 +75,7 @@ public class ObjectManipulation : MonoBehaviour
             }
         }
     }
-
-    public void turnOffAddButton() {
-        AddButton.SetActive(false);
-    }
+    
 
     public void activate() {
         string name = EventSystem.current.currentSelectedGameObject.name;
@@ -101,7 +93,6 @@ public class ObjectManipulation : MonoBehaviour
 
     public void AddModel() {
         Debug.Log("Adding...");
-        AddButton.SetActive(false);
         paintButton.SetActive(false);
         backButton.SetActive(true);
         scrollView.SetActive(true);
@@ -122,8 +113,6 @@ public class ObjectManipulation : MonoBehaviour
     public void reset() {
         current = "";
         scrollView.SetActive(false);
-        AddButton.SetActive(true);
-        RemoveButton.SetActive(false);
 
         xArrow.SetActive(false);
         yArrow.SetActive(false);
