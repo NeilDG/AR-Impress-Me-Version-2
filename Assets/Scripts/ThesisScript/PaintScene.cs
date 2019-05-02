@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd3.jpg"; 
+            path = Application.persistentDataPath + "/abcd3.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -116,8 +116,13 @@ public class PaintScene : MonoBehaviour {
         palette[7] = VermilionRed;
         palette[8] = IvoryBlack;
 
+        for(int x = 0; x < 9; x++) {
+            Debug.Log(palette[x].r + "+" + palette[x].g + "+" + palette[x].b);
+            Debug.Log(palette[x].r + palette[x].g + palette[x].b);
+        }
+
         Color[] rpixels = source.GetPixels(0);
-        float nx = 0.1f, ny = 0.1f;
+        float width = 0f, height = 0f;
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
@@ -244,17 +249,30 @@ public class PaintScene : MonoBehaviour {
 
             rpixels[px] = mixed;
 
-            //Perlin Noise Filter
-            if (Mathf.PerlinNoise(nx, ny) < 0.5f)
-                rpixels[px] += IvoryBlack;
 
-            nx += 1f;
-            if (nx > source.width) {
-                nx = 0.1f;
-                ny += 1f;
+
+            //Perlin Noise Filter
+            float seed = mixed.r + mixed.g + mixed.b, noisex, noisey, nx = 0f, ny = 0f;
+            
+
+            nx = 1f;
+            if(seed > 1)
+                ny = 0.01f; //0.01
+            else ny = 0.1f;
+
+            noisex = width * nx + seed;
+            noisey = height * ny + seed;
+
+            if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
+                rpixels[px] += IvoryBlack;
+            
+            width += 1;
+            if (width > source.width) {
+                width = 0;
+                height += 1;
             }
 
-
+ 
         }
         source.SetPixels(rpixels, 0);
         source.Apply();
