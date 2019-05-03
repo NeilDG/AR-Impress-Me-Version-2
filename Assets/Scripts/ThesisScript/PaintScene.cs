@@ -116,13 +116,10 @@ public class PaintScene : MonoBehaviour {
         palette[7] = VermilionRed;
         palette[8] = IvoryBlack;
 
-        for(int x = 0; x < 9; x++) {
-            Debug.Log(palette[x].r + "+" + palette[x].g + "+" + palette[x].b);
-            Debug.Log(palette[x].r + palette[x].g + palette[x].b);
-        }
-
         Color[] rpixels = source.GetPixels(0);
         float width = 0f, height = 0f;
+        Color mixed = new Color();
+        float avg = 0;
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
@@ -150,6 +147,21 @@ public class PaintScene : MonoBehaviour {
                 }
                 if (bwIndex == 0 || bwIndex == 8)
                     bwdeeper = true;
+
+                //Color Mixing
+                int prev = colorIndex;
+                for (int x = 0; x < 9; x++) {
+                    if (colorIndex != x) {
+                        Color a = palette[colorIndex],
+                              b = palette[x];
+                        if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
+                            lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
+                            mixed = (a + b) / 2;
+                            prev = 9;
+                        }
+                    }
+                }
+                colorIndex = prev;
             }
             else {
                 //First Color Detection
@@ -209,71 +221,68 @@ public class PaintScene : MonoBehaviour {
             }
             
             
-
-            Color mixed = palette[colorIndex];
-            /*
-            //Color Mixing
-            for (int x = 0; x < 9; x++) {
-                if (colorIndex != x) {
-                    Color a = palette[colorIndex],
-                          b = palette[x];
-                    if (lowestValue > ColourDistance(a + b, rpixels[px])) {
-                        lowestValue = ColourDistance(a + b, rpixels[px]);
-                        mixed = a + b;
+            if(colorIndex != 9) {
+                mixed = palette[colorIndex];
+                /*
+                //Color Mixing
+                for (int x = 0; x < 9; x++) {
+                    if (colorIndex != x) {
+                        Color a = palette[colorIndex],
+                              b = palette[x];
+                        if (lowestValue > ColourDistance((a + b)/2, rpixels[px])) {
+                            lowestValue = ColourDistance((a + b)/2, rpixels[px]);
+                            mixed = (a + b)/2;
+                        }
                     }
-                }
-            }*/
+                }*/
+            }
+                
+            //GrayScale Deepener
+            if (bwdeeper)
+                mixed = (mixed + mixed + LeadWhite + IvoryBlack) / 4;
 
             //Black and White Darkener
+            /*
             if (S < 0.1 && B > 0.9) {
-                while (lowestValue > ColourDistance(mixed + LeadWhite, rpixels[px])) {
-                    mixed = mixed + LeadWhite;
+                while (lowestValue > ColourDistance((mixed + LeadWhite)/2, rpixels[px])) {
+                    mixed = (mixed + LeadWhite)/2;
                     lowestValue = ColourDistance(mixed, rpixels[px]);
                 }
                 
             }
             else if (B < 0.1) {
-                while (lowestValue > ColourDistance(mixed + IvoryBlack, rpixels[px])) {
-                    mixed = mixed + IvoryBlack;
+                while (lowestValue > ColourDistance((mixed + IvoryBlack)/2, rpixels[px])) {
+                    mixed = (mixed + IvoryBlack)/2;
                     lowestValue = ColourDistance(mixed, rpixels[px]);
                 }
-            }
-            
-            //GrayScale Deepener
-            if (bwdeeper && bwIndex == 0) {
-                mixed = mixed + LeadWhite;
-            } else if (bwdeeper && bwIndex == 8) {
-                mixed = mixed + IvoryBlack;
-            }
-
+            }*/
 
             rpixels[px] = mixed;
-
-
-
-            //Perlin Noise Filter
-            float seed = mixed.r + mixed.g + mixed.b, noisex, noisey, nx = 0f, ny = 0f;
             
-
+            //Perlin Noise Filter
+            float seed = mixed.r + mixed.g + mixed.b, 
+                  noisex, noisey, nx = 0f, ny = 0f;
+            avg += seed;
             nx = 1f;
             if(seed > 1)
                 ny = 0.01f; //0.01
             else ny = 0.1f;
 
-            noisex = width * nx + seed;
-            noisey = height * ny + seed;
+            noisex = width * nx + (seed * 10);
+            noisey = height * ny + (seed * 10); 
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                rpixels[px] += IvoryBlack;
+                rpixels[px] = (rpixels[px] + rpixels[px] + Color.black)/3;
             
             width += 1;
             if (width > source.width) {
                 width = 0;
                 height += 1;
             }
-
+            
  
         }
+        Debug.Log(avg / rpixels.Length);
         source.SetPixels(rpixels, 0);
         source.Apply();
         return source;
