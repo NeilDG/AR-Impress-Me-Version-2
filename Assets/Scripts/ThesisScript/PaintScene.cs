@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd3.jpg"; 
+            path = Application.persistentDataPath + "/abcd1.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -117,9 +117,9 @@ public class PaintScene : MonoBehaviour {
         palette[8] = IvoryBlack;
 
         Color[] rpixels = source.GetPixels(0);
-        float width = 0f, height = 0f;
+        float width = 0f, height = 0f, avg = 0f;
+        bool curve = true;
         Color mixed = new Color();
-        float avg = 0;
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
@@ -238,8 +238,10 @@ public class PaintScene : MonoBehaviour {
             }
                 
             //GrayScale Deepener
-            if (bwdeeper)
-                mixed = (mixed + mixed + LeadWhite + IvoryBlack) / 4;
+            if (bwdeeper) {
+                mixed = (mixed + mixed + LeadWhite) / 3;
+            }
+                
 
             //Black and White Darkener
             /*
@@ -260,19 +262,24 @@ public class PaintScene : MonoBehaviour {
             rpixels[px] = mixed;
             
             //Perlin Noise Filter
-            float seed = mixed.r + mixed.g + mixed.b, 
+            float seed = (mixed.r + mixed.g + mixed.b)/3, 
                   noisex, noisey, nx = 0f, ny = 0f;
             avg += seed;
             nx = 1f;
-            if(seed > 1)
-                ny = 0.01f; //0.01
-            else ny = 0.1f;
+            //if(seed > 0.5)
+                ny = 0.01f; 
+            //else ny = 0.1f;
 
             noisex = width * nx + (seed * 10);
-            noisey = height * ny + (seed * 10); 
+            noisey = height * ny + (seed * 10);
+
+            if (seed > 0.7) {
+                //noisex = noisex + (height * 2);
+            }
+            else noisex += height;
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                rpixels[px] = (rpixels[px] + rpixels[px] + Color.black)/3;
+                rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
             
             width += 1;
             if (width > source.width) {
