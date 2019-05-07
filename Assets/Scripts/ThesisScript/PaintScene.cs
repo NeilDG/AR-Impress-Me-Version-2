@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd1.jpg"; 
+            path = Application.persistentDataPath + "/abcd5.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -117,8 +117,8 @@ public class PaintScene : MonoBehaviour {
         palette[8] = IvoryBlack;
 
         Color[] rpixels = source.GetPixels(0);
-        float width = 0f, height = 0f, avg = 0f;
-        bool curve = true;
+        float width = 0f, 
+            height = 0f/*source.height*/, avg = 0f;
         Color mixed = new Color();
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
@@ -265,30 +265,54 @@ public class PaintScene : MonoBehaviour {
             float seed = (mixed.r + mixed.g + mixed.b)/3, 
                   noisex, noisey, nx = 0f, ny = 0f;
             avg += seed;
-            nx = 1f;
+            //nx = 0.01f;
             //if(seed > 0.5)
-                ny = 0.01f; 
+                //ny = 0.01f; 
             //else ny = 0.1f;
-
-            noisex = width * nx + (seed * 10);
-            noisey = height * ny + (seed * 10);
-
+            
             if (seed > 0.7) {
-                //noisex = noisex + (height * 2);
+                nx = 0.001f;
+                ny = 0.001f;
+                noisex = width * nx + (seed * 10);
+                noisey = height * ny + (seed * 10);
+                //noisey /= (height * ny); // gets shorter as it goes down
+                //noisey -= (height * ny); //straight lines
+                noisex += height; //straight down
+                noisex += height * (width/source.width);
             }
-            else noisex += height;
+            else {
+                nx = 0.01f;
+                ny = 0.001f;
+                noisex = width * nx + (seed * 10);
+                noisey = height * ny + (seed * 10);
+                //noisex += (height * 2); //sideways
+                //noisex += height; //straight down
+                noisex += height * (width / source.width);
+            }
+
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
                 rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
+
+            /*
+            height -= 1f;
+            if(height == (source.height - source.width)) {
+                width += 1;
+                height = source.height;
+            }*/
+
             
-            width += 1;
-            if (width > source.width) {
+            width += 1f;
+            if (width % source.width == 0) {
                 width = 0;
-                height += 1;
+                height += 1f;
             }
             
  
         }
+        Debug.Log(rpixels.Length);
+        Debug.Log(source.width + " " + source.height);
+        Debug.Log(width + " " + height);
         Debug.Log(avg / rpixels.Length);
         source.SetPixels(rpixels, 0);
         source.Apply();
