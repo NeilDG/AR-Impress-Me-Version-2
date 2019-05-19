@@ -117,13 +117,14 @@ public class PaintScene : MonoBehaviour {
         palette[8] = IvoryBlack;
 
         Color[] rpixels = source.GetPixels(0);
-        float width =/* 0f*/source.width, 
-            height = /*0f*/source.height, avg = 0f;
+        float width =0f/* source.width*/, 
+            height = 0f/*source.height*/, avg = 0f;
         Color mixed = new Color();
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
-            Boolean bwdeeper = false;
+            Boolean bdeeper = false, wdeeper = false;
+
 
             //First Color Detection
             for(int x = 0; x < 9; x++) {
@@ -136,7 +137,7 @@ public class PaintScene : MonoBehaviour {
             float H, S, V;
             Color.RGBToHSV(rpixels[px], out H, out S, out V);
             double B = (Math.Pow(rpixels[px].r * 0.299f, 2) + Math.Pow(rpixels[px].g * 0.587f,2) + Math.Pow(rpixels[px].b * 0.114f, 2)) / 255;
-            if (colorIndex == 0 || colorIndex == 8) {
+           if (colorIndex == 0 || colorIndex == 8) {
                 //GreyScale Balck/White detection
                 double bwlowestValue = 0;
                 for (int x = 0; x < 9; x++) {
@@ -145,9 +146,11 @@ public class PaintScene : MonoBehaviour {
                         bwIndex = x;
                     }
                 }
-                if (bwIndex == 0 || bwIndex == 8)
-                    bwdeeper = true;
-
+                if (bwIndex == 0)
+                    wdeeper = true;
+                else if(bwIndex == 8)
+                    bdeeper = true;
+                /*
                 //Color Mixing
                 int prev = colorIndex;
                 for (int x = 0; x < 9; x++) {
@@ -161,9 +164,9 @@ public class PaintScene : MonoBehaviour {
                         }
                     }
                 }
-                colorIndex = prev;
+                colorIndex = prev;*/
             }
-            else {
+            //else {
                 //First Color Detection
                 float deg = H * 360;
                 double c1, c2;
@@ -218,12 +221,12 @@ public class PaintScene : MonoBehaviour {
                         colorIndex = 7;
                     }
                 }
-            }
+           //}
             
             
             if(colorIndex != 9) {
                 mixed = palette[colorIndex];
-                /*
+                
                 //Color Mixing
                 for (int x = 0; x < 9; x++) {
                     if (colorIndex != x) {
@@ -234,17 +237,21 @@ public class PaintScene : MonoBehaviour {
                             mixed = (a + b)/2;
                         }
                     }
-                }*/
+                }
             }
                 
             //GrayScale Deepener
-            if (bwdeeper) {
+            if (bdeeper) {
+                mixed = (mixed + mixed + IvoryBlack) / 3;
+            }
+            else if (wdeeper) {
                 mixed = (mixed + mixed + LeadWhite) / 3;
             }
-                
+
+
 
             //Black and White Darkener
-            /*
+
             if (S < 0.1 && B > 0.9) {
                 while (lowestValue > ColourDistance((mixed + LeadWhite)/2, rpixels[px])) {
                     mixed = (mixed + LeadWhite)/2;
@@ -257,7 +264,7 @@ public class PaintScene : MonoBehaviour {
                     mixed = (mixed + IvoryBlack)/2;
                     lowestValue = ColourDistance(mixed, rpixels[px]);
                 }
-            }*/
+            }
 
             rpixels[px] = mixed;
             
@@ -270,7 +277,7 @@ public class PaintScene : MonoBehaviour {
                 //ny = 0.01f; 
             //else ny = 0.1f;
             
-            //if (seed < 0.7) {
+            /*if (seed > 0.5) {
                 nx = 0.01f;
                 ny = 0.01f;
                 noisex = width * nx + (seed * 10);
@@ -280,35 +287,58 @@ public class PaintScene : MonoBehaviour {
                 
                 noisex += height; //straight down
                 noisex += height * (width/source.width);
-            //}
-            /*
-            else {
-                nx = 0.01f;
-                ny = 0.001f;
-                noisex = width * nx + (seed * 10);
-                noisey = height * ny + (seed * 10);
+
+                if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
+                    rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
+
+            }
+            else {*/
+                nx = 0.05f;
+                ny = 0.05f;
+                noisex = width * nx / 4 + (seed * 10);
+                noisey = height * ny * 4 + (seed * 10);
+                
+                if(width % (source.width/2) == 0) {
+                    noisey += width;
+                }
+
                 //noisex += (height * 2); //sideways
                 //noisex += height; //straight down
-                noisex += width * (height / source.height);
-            }*/
+                //noisex += width * (height / source.height);
+                noisex += (height * nx);
 
-
-            if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
+                if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
+                    rpixels[px] = (rpixels[px] + rpixels[px] + rpixels[px] + IvoryBlack) / 4;
+            //}
 
             
+            
+            
+            /*
+            nx = 0.01f;
+            ny = 0.01f;
+            noisex = width * nx - (seed * 10); 
+            noisey = height * ny - (seed * 10);
+
+            noisex += height; //straight down
+            noisex += height * (width / source.width);
+
+            if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
+                rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack) / 3;
+            */
+/*
             height -= 1f;
             if(height == (source.height - source.width)) {
                 width -= 1;
                 height = source.height;
-            }
+            }*/
 
-            /*
+            
             width += 1f;
             if (width % source.width == 0) {
                 width = 0;
                 height += 1f;
-            }*/
+            } 
             
  
         }
