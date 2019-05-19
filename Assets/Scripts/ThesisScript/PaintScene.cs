@@ -43,8 +43,8 @@ public class PaintScene : MonoBehaviour {
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
-        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        ScreenCapture.CaptureScreenshot(path);
+        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        //ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
