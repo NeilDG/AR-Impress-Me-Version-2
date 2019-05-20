@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd6.jpg"; 
+            //path = Application.persistentDataPath + "/abcd1.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -314,18 +314,15 @@ public class PaintScene : MonoBehaviour {
             
             
             
-            /*
-            nx = 0.01f;
-            ny = 0.01f;
+            
+            nx = 0.1f;
+            ny = 0.1f;
             noisex = width * nx - (seed * 10); 
             noisey = height * ny - (seed * 10);
 
-            noisex += height; //straight down
-            noisex += height * (width / source.width);
-
             if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
-                rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack) / 3;
-            */
+                rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
+            
 /*
             height -= 1f;
             if(height == (source.height - source.width)) {
