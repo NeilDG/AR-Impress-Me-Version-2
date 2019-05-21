@@ -294,7 +294,7 @@ public class PaintScene : MonoBehaviour {
             noisex = width * nx; 
             noisey = height * ny;
 
-            if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
+            if (Mathf.PerlinNoise(noisex, noisey) < 0.3f)
                 rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
             
             /*if (seed > 0.5) {
