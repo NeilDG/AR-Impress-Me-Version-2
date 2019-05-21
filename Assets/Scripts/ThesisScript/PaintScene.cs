@@ -276,6 +276,14 @@ public class PaintScene : MonoBehaviour {
             //if(seed > 0.5)
                 //ny = 0.01f; 
             //else ny = 0.1f;
+
+            nx = 0.1f;
+            ny = 0.1f;
+            noisex = width * nx - (seed * 10); 
+            noisey = height * ny - (seed * 10);
+
+            if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
+                rpixels[px] = (rpixels[px] * 20 + LeadWhite) / 21;
             
             /*if (seed > 0.5) {
                 nx = 0.01f;
@@ -310,18 +318,6 @@ public class PaintScene : MonoBehaviour {
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
                     rpixels[px] = (rpixels[px] * 5 + IvoryBlack) / 6;
             //}
-
-            
-            
-            
-            
-            nx = 0.1f;
-            ny = 0.1f;
-            noisex = width * nx - (seed * 10); 
-            noisey = height * ny - (seed * 10);
-
-            if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
-                rpixels[px] = (rpixels[px] * 20 + LeadWhite) / 21;
             
 /*
             height -= 1f;
