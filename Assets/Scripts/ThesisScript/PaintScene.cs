@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd3.jpg"; 
+            //path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -117,17 +117,22 @@ public class PaintScene : MonoBehaviour {
         palette[8] = IvoryBlack;
 
         Color[] rpixels = source.GetPixels(0);
-        float width =0f/* source.width*/, 
-            height = 0f/*source.height*/, avg = 0f;
+        float width = 0f/* source.width*/,
+             height = 0f/*source.height*/,
+             gradientx = 4f,
+             gradienty = 4f;
+            
         Color mixed = new Color();
+
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
-            Boolean bdeeper = false, wdeeper = false;
+            Boolean bdeeper = false, wdeeper = false, mix = false;
 
+            rpixels[px] *= 1.1f;
 
             //First Color Detection
-            for(int x = 0; x < 9; x++) {
+            for (int x = 0; x < 9; x++) {
                 if(lowestValue > ColourDistance(palette[x], rpixels[px]) || colorIndex == -1) {
                     lowestValue = ColourDistance(palette[x], rpixels[px]);
                     colorIndex = x;
@@ -138,6 +143,8 @@ public class PaintScene : MonoBehaviour {
             Color.RGBToHSV(rpixels[px], out H, out S, out V);
             double B = (Math.Pow(rpixels[px].r * 0.299f, 2) + Math.Pow(rpixels[px].g * 0.587f,2) + Math.Pow(rpixels[px].b * 0.114f, 2)) / 255;
            if (colorIndex == 0 || colorIndex == 8) {
+                mixed = palette[colorIndex];
+                mix = true;
                 //GreyScale Balck/White detection
                 double bwlowestValue = 0;
                 for (int x = 0; x < 9; x++) {
@@ -221,23 +228,28 @@ public class PaintScene : MonoBehaviour {
                         colorIndex = 7;
                     }
                 }
-           //}
+            //}
             
             
             if(colorIndex != 9) {
-                mixed = palette[colorIndex];
-                
+                if (mix) {
+                    mixed = (mixed + palette[colorIndex]) / 2;
+                }
+                else 
+                    mixed = palette[colorIndex];
+
                 //Color Mixing
                 for (int x = 0; x < 9; x++) {
                     if (colorIndex != x) {
-                        Color a = palette[colorIndex],
+                        Color a = mixed,
                               b = palette[x];
-                        if (lowestValue > ColourDistance((a + b)/2, rpixels[px])) {
-                            lowestValue = ColourDistance((a + b)/2, rpixels[px]);
-                            mixed = (a + b)/2;
+                        if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
+                            lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
+                            colorIndex = x;
                         }
                     }
                 }
+                mixed = (mixed + palette[colorIndex]) / 2;
             }
                 
             //GrayScale Deepener
@@ -266,12 +278,12 @@ public class PaintScene : MonoBehaviour {
                 }
             }
 
-            rpixels[px] = mixed;
             
+            rpixels[px] = mixed;
+
             //Perlin Noise Filter
             float seed = (mixed.r + mixed.g + mixed.b)/3, 
                   noisex, noisey, nx = 0f, ny = 0f;
-            avg += seed;
             //nx = 0.01f;
             //if(seed > 0.5)
                 //ny = 0.01f; 
@@ -279,11 +291,11 @@ public class PaintScene : MonoBehaviour {
 
             nx = 0.1f;
             ny = 0.1f;
-            noisex = width * nx - (seed * 10); 
-            noisey = height * ny - (seed * 10);
+            noisex = width * nx; 
+            noisey = height * ny;
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
-                rpixels[px] = (rpixels[px] * 20 + LeadWhite) / 21;
+                rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
             
             /*if (seed > 0.5) {
                 nx = 0.01f;
@@ -303,22 +315,25 @@ public class PaintScene : MonoBehaviour {
             else {*/
                 nx = 0.05f;
                 ny = 0.05f;
-                noisex = width * nx / 4 + (seed * 10);
-                noisey = height * ny * 4 + (seed * 10);
+                noisex = width * nx / gradientx;
+                noisey = height * ny * gradienty;
+                gradientx += 0.00001f;
+                gradienty += 0.000005f;
                 
-                //if(width % (source.width/2) == 0) {
-                    //noisey += width;
-                //}
-
+                
                 //noisex += (height * 2); //sideways
                 //noisex += height; //straight down
                 //noisex += width * (height / source.height);
+
                 noisex += (height * nx);
+                noisey += (width * ny /  8);
+                
 
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    rpixels[px] = (rpixels[px] * 5 + IvoryBlack) / 6;
+                    rpixels[px] = (rpixels[px] * 7 + IvoryBlack) / 8;
             //}
-            
+
+            rpixels[px] *= 1.1f;
 /*
             height -= 1f;
             if(height == (source.height - source.width)) {
@@ -326,7 +341,7 @@ public class PaintScene : MonoBehaviour {
                 height = source.height;
             }*/
 
-            
+
             width += 1f;
             if (width % source.width == 0) {
                 width = 0;
@@ -335,10 +350,7 @@ public class PaintScene : MonoBehaviour {
             
  
         }
-        Debug.Log(rpixels.Length);
-        Debug.Log(source.width + " " + source.height);
-        Debug.Log(width + " " + height);
-        Debug.Log(avg / rpixels.Length);
+        Debug.Log(gradientx + " " + gradienty);
         source.SetPixels(rpixels, 0);
         source.Apply();
         return source;
