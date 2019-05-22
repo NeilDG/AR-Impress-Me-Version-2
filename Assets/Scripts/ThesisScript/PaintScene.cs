@@ -43,8 +43,8 @@ public class PaintScene : MonoBehaviour {
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
-        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        //ScreenCapture.CaptureScreenshot(path);
+        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd1.jpg"; 
+            path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -254,10 +254,10 @@ public class PaintScene : MonoBehaviour {
                 
             //GrayScale Deepener
             if (bdeeper) {
-                //mixed = (mixed + mixed + IvoryBlack) / 3;
+                mixed = (mixed + mixed + IvoryBlack) / 3;
             }
             else if (wdeeper) {
-                //mixed = (mixed + mixed + LeadWhite) / 3;
+                mixed = (mixed + mixed + LeadWhite) / 3;
             }
 
 
@@ -295,7 +295,7 @@ public class PaintScene : MonoBehaviour {
             noisey = height * ny;
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.3f)
-                //rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
+                rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
             
             /*if (seed > 0.5) {
                 nx = 0.01f;
@@ -330,10 +330,10 @@ public class PaintScene : MonoBehaviour {
                 
 
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    //rpixels[px] = (rpixels[px] * 7 + IvoryBlack) / 8;
+                    rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
             //}
 
-            rpixels[px] *= 1.25f;
+            //rpixels[px] *= 1.25f;
 /*
             height -= 1f;
             if(height == (source.height - source.width)) {
