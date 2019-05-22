@@ -43,8 +43,8 @@ public class PaintScene : MonoBehaviour {
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
-        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        //ScreenCapture.CaptureScreenshot(path);
+        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
@@ -63,6 +63,7 @@ public class PaintScene : MonoBehaviour {
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
             texture = ScaleTexture(texture, 480, 848);
+            //texture = ScaleTexture(texture, texture.width/2, texture.height/2);
             texture = changeColor(texture);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
@@ -254,10 +255,10 @@ public class PaintScene : MonoBehaviour {
                 
             //GrayScale Deepener
             if (bdeeper) {
-                mixed = (mixed + mixed + IvoryBlack) / 3;
+                //mixed = (mixed + mixed + IvoryBlack) / 3;
             }
             else if (wdeeper) {
-                mixed = (mixed + mixed + LeadWhite) / 3;
+                //mixed = (mixed + mixed + LeadWhite) / 3;
             }
 
 
@@ -295,7 +296,7 @@ public class PaintScene : MonoBehaviour {
             noisey = height * ny;
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.3f)
-                rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
+                //rpixels[px] = (rpixels[px] * 19 + LeadWhite) / 20;
             
             /*if (seed > 0.5) {
                 nx = 0.01f;
@@ -315,8 +316,10 @@ public class PaintScene : MonoBehaviour {
             else {*/
                 nx = 0.05f;
                 ny = 0.05f;
-                noisex = width * nx / gradientx;
-                noisey = height * ny * gradienty;
+                //noisex = width * nx / gradientx;
+                //noisey = height * ny * gradienty;
+                noisex = width * nx / 4;
+                noisey = height * ny * 4;
                 gradientx += 0.00001f;
                 gradienty += 0.000005f;
                 
@@ -330,11 +333,11 @@ public class PaintScene : MonoBehaviour {
                 
 
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
+                    //rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
             //}
 
-            //rpixels[px] *= 1.25f;
-/*
+            rpixels[px] *= 1.25f;
+            /*
             height -= 1f;
             if(height == (source.height - source.width)) {
                 width -= 1;
