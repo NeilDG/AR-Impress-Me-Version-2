@@ -43,8 +43,8 @@ public class PaintScene : MonoBehaviour {
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
-        //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        ScreenCapture.CaptureScreenshot(path);
+        ScreenCapture.CaptureScreenshot("UnalteredScene.png");
+        //ScreenCapture.CaptureScreenshot(path);
         Debug.Log(path);
     }
 
@@ -58,7 +58,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd6.jpg"; 
+            //path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
