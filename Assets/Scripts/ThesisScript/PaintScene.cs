@@ -274,17 +274,17 @@ public class PaintScene : MonoBehaviour {
             //Black and White Darkener
 
             if (S < 0.1 && B > 0.9) {
-                while (lowestValue > ColourDistance((mixed + LeadWhite)/2, rpixels[px])) {
+                /*while (lowestValue > ColourDistance((mixed + LeadWhite)/2, rpixels[px])) {
                     mixed = (mixed + LeadWhite)/2;
                     lowestValue = ColourDistance(mixed, rpixels[px]);
-                }
+                }*/
                 
             }
             else if (B < 0.1) {
-                while (lowestValue > ColourDistance((mixed + IvoryBlack)/2, rpixels[px])) {
+               /* while (lowestValue > ColourDistance((mixed + IvoryBlack)/2, rpixels[px])) {
                     mixed = (mixed + IvoryBlack)/2;
                     lowestValue = ColourDistance(mixed, rpixels[px]);
-                }
+                }*/
             }
 
             
