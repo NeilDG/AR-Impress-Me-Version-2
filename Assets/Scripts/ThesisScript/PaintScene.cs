@@ -13,7 +13,7 @@ public class PaintScene : MonoBehaviour {
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
 
-
+    public GameObject loadingScreen;
     private Sprite screenshot;
     private string path = "";
 
@@ -38,6 +38,12 @@ public class PaintScene : MonoBehaviour {
         screenShot();
         yield return new WaitUntil(() => File.Exists(path) == true);
         showScreenShot();
+    }
+
+    private void LoadingScreen()
+    {
+        // Set it to the inverse of what the current active state is
+        loadingScreen.SetActive(!loadingScreen.activeSelf);
     }
 
     private void screenShot() {
