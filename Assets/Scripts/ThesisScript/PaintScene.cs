@@ -64,12 +64,13 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd7.jpg"; 
+            //path = Application.persistentDataPath + "/abcd10.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
             int height = texture.height / (texture.width / 480);
             texture = ScaleTexture(texture, 480, height);
+            Debug.Log(height);
             //texture = ScaleTexture(texture, texture.width/2, texture.height/2);
             texture = changeColor(texture);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
