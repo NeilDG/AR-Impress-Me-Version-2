@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.IO;
 
 public class ObjectManipulation : MonoBehaviour
 {
@@ -55,10 +56,11 @@ public class ObjectManipulation : MonoBehaviour
             newButton.name = models[x].name;
             newButton.GetComponentInChildren<Text>().text = models[x].name;
 
-            string path = Application.dataPath + "/Assets/Art/cube_06.png";
-            Texture2D myTexture = Resources.Load<Texture2D>(path); ;
+            string path = Application.dataPath + "/Art/Models-pics/"+ models[x].name + ".png";
 
-            newButton.GetComponentInChildren<RawImage>().texture = myTexture;
+            //Debug.Log("SHIT " + myTexture.name);
+
+            newButton.GetComponentInChildren<RawImage>().texture = LoadPNG(path);
            
             newButton.transform.parent = contents.transform;
             newButton.transform.localPosition = buttonPrefab.transform.localPosition;
@@ -142,5 +144,20 @@ public class ObjectManipulation : MonoBehaviour
         if(cGameTransform != null)
             cGameTransform.parent = imagetarget.transform;
     }
-    
+
+    public static Texture2D LoadPNG(string filePath)
+    {
+
+        Texture2D tex = null;
+        byte[] fileData;
+
+        if (File.Exists(filePath))
+        {
+            fileData = File.ReadAllBytes(filePath);
+            tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
+        return tex;
+    }
+
 }
