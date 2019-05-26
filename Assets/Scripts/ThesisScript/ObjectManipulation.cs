@@ -56,7 +56,8 @@ public class ObjectManipulation : MonoBehaviour
             newButton.name = models[x].name;
             newButton.GetComponentInChildren<Text>().text = models[x].name;
 
-            string path = Application.dataPath + "/Art/Models-pics/"+ models[x].name + ".png";
+            //string path = Application.dataPath + "/Art/Models-pics/"+ models[x].name + ".png";
+            string path = Application.persistentDataPath + "/Art/Models-pics/" + models[x].name + ".png";
 
             //Debug.Log("SHIT " + myTexture.name);
 
