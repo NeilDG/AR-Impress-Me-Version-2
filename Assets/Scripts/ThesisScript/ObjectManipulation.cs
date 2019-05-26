@@ -30,10 +30,12 @@ public class ObjectManipulation : MonoBehaviour
     private Transform cGameTransform;
     private GameObject cGameObject;
 
+    [SerializeField] GameObject buttonPrefab;
 
     // Start is called before the first frame update
     void Start()
     {
+        /*
         for(int x = 0; x < models.Length; x++) {
             templateB.name = models[x].name;
             templateT.text = models[x].name;
@@ -42,6 +44,25 @@ public class ObjectManipulation : MonoBehaviour
             newButton.transform.parent = contents.transform;
             newButton.transform.localPosition = templateB.transform.localPosition;
             newButton.transform.localScale = templateB.transform.localScale;
+
+            newButton.SetActive(true);
+        }
+        */
+
+        for (int x = 0; x < models.Length; x++)
+        {
+            GameObject newButton = (GameObject)Instantiate(buttonPrefab);
+            newButton.name = models[x].name;
+            newButton.GetComponentInChildren<Text>().text = models[x].name;
+
+            string path = Application.persistentDataPath + "/Assets/Art/cube_06.png";
+            Texture2D myTexture = Resources.Load<Texture2D>(path); ;
+
+            newButton.GetComponentInChildren<RawImage>().texture = myTexture;
+           
+            newButton.transform.parent = contents.transform;
+            newButton.transform.localPosition = buttonPrefab.transform.localPosition;
+            newButton.transform.localScale = buttonPrefab.transform.localScale;
 
             newButton.SetActive(true);
         }
