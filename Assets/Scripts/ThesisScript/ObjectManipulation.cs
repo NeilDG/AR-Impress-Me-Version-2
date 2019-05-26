@@ -55,7 +55,7 @@ public class ObjectManipulation : MonoBehaviour
             newButton.name = models[x].name;
             newButton.GetComponentInChildren<Text>().text = models[x].name;
 
-            string path = Application.persistentDataPath + "/Assets/Art/cube_06.png";
+            string path = Application.dataPath + "/Assets/Art/cube_06.png";
             Texture2D myTexture = Resources.Load<Texture2D>(path); ;
 
             newButton.GetComponentInChildren<RawImage>().texture = myTexture;
