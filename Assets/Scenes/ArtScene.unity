@@ -6616,6 +6616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arcamera: {fileID: 345702178}
+  camera: {fileID: 345702182}
   objectMan: {fileID: 1675197356}
   paintButton: {fileID: 1680429479}
   backButton: {fileID: 974259096}

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class PaintScene : MonoBehaviour {
     [SerializeField] private GameObject arcamera;
+    [SerializeField] private Camera camera;
     [SerializeField] private ObjectManipulation objectMan;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
@@ -50,7 +51,22 @@ public class PaintScene : MonoBehaviour {
         Debug.Log(Application.persistentDataPath);
         path = Application.persistentDataPath + "/UnalteredScene.png";
         //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
-        ScreenCapture.CaptureScreenshot(path);
+        //ScreenCapture.CaptureScreenshot(path);
+        RenderTexture rt = new RenderTexture(Screen.width, Screen.height, 24);
+        camera.targetTexture = rt;
+
+        Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+        camera.Render();
+        RenderTexture.active = rt;
+        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        texture.Apply();
+        byte[] shot = texture.EncodeToPNG();
+
+        camera.targetTexture = null;
+        RenderTexture.active = null;
+        Destroy(rt);
+
+        File.WriteAllBytes(path, shot);
         Debug.Log(path);
     }
 
