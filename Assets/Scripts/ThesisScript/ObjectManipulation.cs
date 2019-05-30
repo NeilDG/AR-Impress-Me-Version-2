@@ -19,6 +19,8 @@ public class ObjectManipulation : MonoBehaviour
 
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject sliderObj;
+    [SerializeField] private UnityEngine.UI.Slider scaleSlider;
 
     [SerializeField] private GameObject scrollView;
     [SerializeField] private GameObject contents;
@@ -82,8 +84,9 @@ public class ObjectManipulation : MonoBehaviour
                     reset();
                     cGameTransform = hit.transform;
                     current = hit.transform.name;
-                    
 
+                    backButton.SetActive(true);
+                    sliderObj.SetActive(true);
                     xArrow.SetActive(true);
                     yArrow.SetActive(true);
                     zArrow.SetActive(true);
@@ -97,6 +100,10 @@ public class ObjectManipulation : MonoBehaviour
                 if(!scrollView.active && !backButton.active) 
                     reset();
             }
+        }
+        if (scaleSlider.isActiveAndEnabled) {
+            float scale = scaleSlider.value;
+            cGameTransform.localScale = new Vector3(scale, scale, scale);
         }
     }
     
@@ -141,8 +148,9 @@ public class ObjectManipulation : MonoBehaviour
         xArrow.SetActive(false);
         yArrow.SetActive(false);
         zArrow.SetActive(false);
+        sliderObj.SetActive(false);
 
-        if(cGameTransform != null)
+        if (cGameTransform != null)
             cGameTransform.parent = imagetarget.transform;
     }
 

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PaintScene : MonoBehaviour {
-
+    [SerializeField] private GameObject arcamera;
     [SerializeField] private ObjectManipulation objectMan;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
@@ -76,6 +76,7 @@ public class PaintScene : MonoBehaviour {
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
             screenshot = sprite;
+            arcamera.SetActive(false);
         }
     }
 
@@ -87,6 +88,7 @@ public class PaintScene : MonoBehaviour {
         backButton.SetActive(false);
         paintButton.SetActive(true);
         objectMan.reset();
+        arcamera.SetActive(true);
     }
 
     private Texture2D ScaleTexture(Texture2D source, int targetWidth, int targetHeight) {
