@@ -144,7 +144,7 @@ RectTransform:
   - {fileID: 1256387000}
   - {fileID: 650030430}
   m_Father: {fileID: 489941396}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1565,7 +1565,6 @@ RectTransform:
   - {fileID: 974259097}
   - {fileID: 1634973052}
   - {fileID: 390755259}
-  - {fileID: 724975591}
   - {fileID: 94976869}
   m_Father: {fileID: 224719498881217981}
   m_RootOrder: 2
@@ -2180,16 +2179,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 724975590}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.541, y: 2.541, z: 2.541}
+  m_LocalScale: {x: 9.343166, y: 11.864337, z: 9.343166}
   m_Children: []
-  m_Father: {fileID: 489941396}
-  m_RootOrder: 6
+  m_Father: {fileID: 1141504774}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -239, y: -453}
+  m_AnchoredPosition: {x: 18.384705, y: 312.83392}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &724975592
@@ -3763,7 +3762,7 @@ GameObject:
   - component: {fileID: 1141504776}
   - component: {fileID: 1141504775}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3782,6 +3781,7 @@ RectTransform:
   m_Children:
   - {fileID: 326058886}
   - {fileID: 1586294174}
+  - {fileID: 724975591}
   m_Father: {fileID: 489941396}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6674,6 +6674,7 @@ MonoBehaviour:
   paintButton: {fileID: 1680429479}
   backButton: {fileID: 974259096}
   sliderObj: {fileID: 94976868}
+  ModelMenu: {fileID: 1141504773}
   scaleSlider: {fileID: 94976870}
   scrollView: {fileID: 1634973051}
   contents: {fileID: 1030586590}
