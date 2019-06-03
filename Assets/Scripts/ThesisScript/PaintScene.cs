@@ -83,9 +83,15 @@ public class PaintScene : MonoBehaviour {
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
-            int height = texture.height / (texture.width / 480);
-            texture = ScaleTexture(texture, 480, height);
-            Debug.Log(height);
+            if (Screen.orientation == ScreenOrientation.Portrait) {
+                int height = texture.height / (texture.width / 480);
+                texture = ScaleTexture(texture, 480, height);
+            }
+            else {
+                int width = texture.width / (texture.height / 480);
+                texture = ScaleTexture(texture, width, 480);
+            }
+            
             //texture = ScaleTexture(texture, texture.width/2, texture.height/2);
             texture = changeColor(texture);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);

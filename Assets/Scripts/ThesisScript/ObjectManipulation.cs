@@ -110,6 +110,7 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.SetActive(true);
                     
                     cGameTransform.parent = arcamera.transform;
+                    scaleSlider.value = cGameTransform.localScale.x;
                     xArrow.transform.localPosition = cGameTransform.localPosition;
                     yArrow.transform.localPosition = cGameTransform.localPosition;
                     zArrow.transform.localPosition = cGameTransform.localPosition;
