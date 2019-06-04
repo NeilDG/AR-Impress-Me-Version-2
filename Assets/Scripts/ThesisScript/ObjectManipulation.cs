@@ -80,19 +80,6 @@ public class ObjectManipulation : MonoBehaviour
     // Update is called once per frame
     void Update() {
 
-        if (Screen.orientation == ScreenOrientation.Portrait) {
-            paintButton.transform.localPosition = new Vector3(158, -566, 0);
-            backButton.transform.localPosition = new Vector3(158, -566, 0);
-            sliderObj.transform.localPosition = new Vector3(-322, -109, 0);
-            ModelMenu.transform.localPosition = new Vector3(-244, -520, 0);
-        }
-        else {
-            paintButton.transform.localPosition = new Vector3(223, -140, 0);
-            backButton.transform.localPosition = new Vector3(223, -140, 0);
-            sliderObj.transform.localPosition = new Vector3(-322, 0, 0);
-            ModelMenu.transform.localPosition = new Vector3(248, 76, 0);
-        }
-
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
             var ray = arcamera.ScreenPointToRay(Input.mousePosition);
