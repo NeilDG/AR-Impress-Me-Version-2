@@ -80,6 +80,7 @@ public class PaintScene : MonoBehaviour {
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
             //path = Application.persistentDataPath + "/abcd6.jpg"; 
+            //path = "C:/Users/JAROD/Desktop/Skyline.jpg";
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -367,7 +368,7 @@ public class PaintScene : MonoBehaviour {
                     //rpixels[px] = (rpixels[px] * 15 + IvoryBlack) / 16;
             //}
 
-            rpixels[px] *= 1.5f;
+            rpixels[px] *= 1.1f;
             /*
             height -= 1f;
             if(height == (source.height - source.width)) {
