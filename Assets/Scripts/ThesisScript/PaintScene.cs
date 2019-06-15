@@ -368,7 +368,7 @@ public class PaintScene : MonoBehaviour {
                     //rpixels[px] = (rpixels[px] * 15 + IvoryBlack) / 16;
             //}
 
-            rpixels[px] *= 1.1f;
+            rpixels[px] *= 1.5f;
             /*
             height -= 1f;
             if(height == (source.height - source.width)) {
