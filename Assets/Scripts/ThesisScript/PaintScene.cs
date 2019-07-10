@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.UnityUtils.Helper;
+using OpenCVForUnity.ImgcodecsModule;
+using OpenCVForUnity.XphotoModule;
 
 public class PaintScene : MonoBehaviour {
     [SerializeField] private GameObject arcamera;
@@ -17,11 +23,15 @@ public class PaintScene : MonoBehaviour {
     public GameObject loadingScreen;
     private Sprite screenshot;
     private string path = "";
+    List<Color32> color_palette = new List<Color32>();
+
+    //opencv
+    private WebCamTextureToMatHelper webCamTextureToMatHelper;
 
     // Use this for initialization
     void Start () {
 
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -33,6 +43,16 @@ public class PaintScene : MonoBehaviour {
     }
 
     private IEnumerator Paint() {
+        //OPENCV
+        webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
+
+        #if UNITY_ANDROID && !UNITY_EDITOR
+        // Avoids the front camera low light issue that occurs in only some Android devices (e.g. Google Pixel, Pixel2).
+        webCamTextureToMatHelper.avoidAndroidFrontCameraLowLightIssue = true;
+        #endif
+        webCamTextureToMatHelper.Initialize();
+        //OPENCV
+
         objectMan.reset();
         myCanvas.enabled = false;
         screenShot();
@@ -53,11 +73,10 @@ public class PaintScene : MonoBehaviour {
         //ScreenCapture.CaptureScreenshot(path);
         RenderTexture rt = new RenderTexture(Screen.width, Screen.height, 24);
         camera.targetTexture = rt;
-
         Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         camera.Render();
         RenderTexture.active = rt;
-        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        texture.ReadPixels(new UnityEngine.Rect(0, 0, Screen.width, Screen.height), 0, 0);
         texture.Apply();
         byte[] shot = texture.EncodeToPNG();
 
@@ -79,10 +98,11 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd6.jpg"; 
+            path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
+            
             if (Screen.orientation == ScreenOrientation.Portrait) {
                 int height = texture.height / (texture.width / 480);
                 texture = ScaleTexture(texture, 480, height);
@@ -90,11 +110,118 @@ public class PaintScene : MonoBehaviour {
             else {
                 int width = texture.width / (texture.height / 480);
                 texture = ScaleTexture(texture, width, 480);
+            }//texture = ScaleTexture(texture, texture.width/2, texture.height/2);
+            texture = changeColor(texture);
+            
+            //OPENCV
+            Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            Utils.texture2DToMat(texture, TextureMat);
+            
+            Mat label = new Mat(texture.height, texture.width, CvType.CV_8UC1);
+            //Get KMEANS
+            //TermCriteria tc = new TermCriteria(TermCriteria.EPS, 10, 1);
+            //Core.kmeans(TextureMat, 20, label, tc, 10, Core.KMEANS_PP_CENTERS);
+
+            Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+            Mat gradientx = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+            Mat gradienty = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+            
+            Mat rgbaMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            Utils.texture2DToMat(texture, rgbaMat);
+            
+            Imgproc.cvtColor(rgbaMat, grayMat, Imgproc.COLOR_RGBA2GRAY);
+            Imgproc.Scharr(grayMat, gradientx, rgbaMat.depth(), 1, 0, 1 / 15.36);
+            Imgproc.Scharr(grayMat, gradienty, rgbaMat.depth(), 0, 1, 1 / 15.36);
+
+            //int gradient_smoothing_radius = Math.Round(Math.Max(rgbaMat.dims) / 50);
+            //chosen stroke scale: 2
+            //chosen gradient smoothing radius: 16
+            Imgproc.GaussianBlur(gradientx, gradientx, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
+            Imgproc.GaussianBlur(gradienty, gradienty, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
+
+            Imgproc.medianBlur(rgbaMat, rgbaMat, 11);
+
+            List<int> gridx = new List<int>();
+            List<int> gridy = new List<int>();
+            int index = 0;
+            System.Random rnd = new System.Random();
+
+            //new grid
+            Debug.Log(texture.height);
+            Debug.Log(texture.width);
+            for (int i = 0; i < texture.width; i+=3) {
+                for (int j = 0; j < texture.height; j+=3) {
+                    int x = rnd.Next(-1, 2) + i;
+                    int y = rnd.Next(-1, 2) + j;
+
+                    gridy.Add(y % texture.height);
+                    gridx.Add(x % texture.width);
+                    index++;
+                }
+            }
+            //shuffle grid
+            int n = gridy.Count;
+            while (n > 1) {
+                n--;
+                int k = rnd.Next(n + 1);
+                int temp = gridy[k];
+                gridy[k] = gridy[n];
+                gridy[n] = temp;
+
+                temp = gridx[k];
+                gridx[k] = gridx[n];
+                gridx[n] = temp;
+            }
+
+            int batch_size = 10000;
+            //Debug.Log(gradientx.get(0,0)[0]);
+            //Debug.Log(gradienty.get(0, 0)[0]);
+            List<Color32> pixels = new List<Color32>();
+            /*//height == row, width == cols
+            Color32 cpixel1 = texture.GetPixel(gridx[0], (gridy[0] - (texture.height-1))*(-1));
+            double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
+            Debug.Log(cpixel1);
+            Debug.Log(pixel1[0] + " " + pixel1[1] + " " + pixel1[2]);*/
+            Debug.Log(color_palette.Count);
+            for (int h = 0; h < index - 1; h += batch_size) {
+                pixels = new List<Color32>();
+                int endpoint = h + batch_size;
+                if (endpoint > index - 1)
+                    endpoint = index - 1;
+                //get the color from the texture
+                for (int px = h; px < endpoint; px++) {
+                    Color32 cpixel = texture.GetPixel(gridx[px], (gridy[px] - (texture.height - 1)) * (-1));
+                    pixels.Add(cpixel);
+                }
+                int cindex = 0;
+                for (int px = h; px < endpoint; px++) {
+                    int x = gridx[px],
+                        y = gridy[px];
+
+                    //get color
+                    Color32 cpixel;
+                    //use color of pixel
+                    int cprob = rnd.Next(1, 11);
+
+                    if(cprob <= 9) {
+                        cpixel = pixels[cindex];
+                    } else {
+                        cprob = rnd.Next(0, color_palette.Count-1);
+                        cpixel = color_palette[cprob];
+                    }
+                    cindex++;
+                    //get angle
+                    double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
+                    double length = Math.Round(2+2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
+                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 2), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
+                }
             }
             
-            //texture = ScaleTexture(texture, texture.width/2, texture.height/2);
-            texture = changeColor(texture);
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
+            Utils.matToTexture2D(rgbaMat, texture);
+            
+            //OPENCV
+            
+            Sprite sprite = Sprite.Create(texture, new UnityEngine.Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
             screenshot = sprite;
             arcamera.SetActive(false);
@@ -156,12 +283,13 @@ public class PaintScene : MonoBehaviour {
             
         Color mixed = new Color();
 
+        Debug.Log(rpixels.Length);
+
         for (int px = 0; px < rpixels.Length; px++) {
             double lowestValue = 0;
             int colorIndex = -1, bwIndex = -1;
             Boolean bdeeper = false, wdeeper = false, mix = false;
-
-            //rpixels[px] *= 1.1f;
+            
 
             //First Color Detection
             for (int x = 0; x < 9; x++) {
@@ -174,7 +302,7 @@ public class PaintScene : MonoBehaviour {
             float H, S, V;
             Color.RGBToHSV(rpixels[px], out H, out S, out V);
             double B = (Math.Pow(rpixels[px].r * 0.299f, 2) + Math.Pow(rpixels[px].g * 0.587f,2) + Math.Pow(rpixels[px].b * 0.114f, 2)) / 255;
-           if (colorIndex == 0 || colorIndex == 8) {
+            if (colorIndex == 0 || colorIndex == 8) {
                 mixed = palette[colorIndex];
                 mix = true;
                 //GreyScale Balck/White detection
@@ -312,7 +440,12 @@ public class PaintScene : MonoBehaviour {
 
             
             rpixels[px] = mixed;
+            Color32 cpixel = mixed;
+            if (!color_palette.Contains(cpixel)) {
+                color_palette.Add(cpixel);
+            }
 
+            /*
             //Perlin Noise Filter
             float seed = (mixed.r + mixed.g + mixed.b)/3, 
                   noisex, noisey, nx = 0f, ny = 0f;
@@ -327,7 +460,7 @@ public class PaintScene : MonoBehaviour {
             noisey = height * ny;
 
             if (Mathf.PerlinNoise(noisex, noisey) < 0.3f)
-                rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
+                //rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
             
             /*if (seed > 0.5) {
                 nx = 0.01f;
@@ -344,7 +477,7 @@ public class PaintScene : MonoBehaviour {
                     rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
 
             }
-            else {*/
+            else {*//*
                 nx = 0.05f;
                 ny = 0.1f;
                 noisex = width * nx / gradientx;
@@ -364,10 +497,10 @@ public class PaintScene : MonoBehaviour {
                 
 
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
-            //}
+                    //rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
+            //} */
 
-            rpixels[px] *= 1.5f;
+            //rpixels[px] *= 1.5f;
             /*
             height -= 1f;
             if(height == (source.height - source.width)) {
@@ -375,16 +508,16 @@ public class PaintScene : MonoBehaviour {
                 height = source.height;
             }*/
 
-
+            /*
             width += 1f;
             if (width % source.width == 0) {
                 width = 0;
                 height += 1f;
-            } 
+            } */
             
  
         }
-        Debug.Log(gradientx + " " + gradienty);
+        //Debug.Log(gradientx + " " + gradienty);
         source.SetPixels(rpixels, 0);
         source.Apply();
         return source;

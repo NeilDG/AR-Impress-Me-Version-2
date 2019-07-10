@@ -1,91 +1,97 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/OilPainting"
+﻿Shader "Hidden/OilPainting"
 {
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
-		_Radius("Radius", Range(0, 20)) = 0
+		_MainTex("Base (RGB)", 2D) = "white" {}
+		_SamplingKernelWidth("Sample Kernel Width", Range(1, 5)) = 0
+		_ColorIntensities("Color", Range(10, 30)) = 0
+		_Distance("Color", Range(1, 4)) = 0
+
 	}
+
 	SubShader
 	{
-		Blend SrcAlpha OneMinusSrcAlpha
+		// No culling or depth
+		Cull Off ZWrite Off ZTest Always
+
+		/////////////////////////
+		// Oil Painting Shader //
+		/////////////////////////
+
+		// 0 : Oil Painting
 		Pass
 		{
 			CGPROGRAM
-			#pragma vertex vert
+			#pragma vertex vert_img
 			#pragma fragment frag
-			#pragma target 3.0
+
+			#pragma target 5.0
+
 			#include "UnityCG.cginc"
 
-			struct v2f {
-				float4 pos : SV_POSITION;
-				half2 uv : TEXCOORD0;
+			uniform sampler2D _MainTex;
+			uniform float4 _MainTex_TexelSize;
+			uniform int _SamplingKernelWidth;
+			uniform float _Distance;
+			uniform int _ColorIntensities;
+
+			sampler2D _CameraDepthTexture;
+
+			// Struct used to store how many times a color intensity is repeated.
+			struct pixelIntensity {
+				int count;
+				float3 sum;
 			};
 
-			sampler2D _MainTex;
-			float4 _MainTex_ST;
-
-			v2f vert(appdata_base v) {
-				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
-				return o;
+			// Struct initialization.
+			pixelIntensity PixelIntensity(int c, float3 s) {
+				pixelIntensity p;
+				p.count = c;
+				p.sum = s;
+				return p;
 			}
 
-			int _Radius;
-			float4 _MainTex_TexelSize;
-
-			float4 frag(v2f i) : SV_Target
+			float4 frag(v2f_img i) : SV_TARGET
 			{
-				half2 uv = i.uv;
+				// Sample the pixel depth
+				float depth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv));
 
-				float3 mean[4] = {
-					{0, 0, 0},
-					{0, 0, 0},
-					{0, 0, 0},
-					{0, 0, 0}
-				};
+				// Declare and initialize all the color intensities we'll check.
+				pixelIntensity pixels[30];
+				pixels[0] = pixels[1] = pixels[2] = pixels[3] = pixels[4] = pixels[5] = pixels[6] = pixels[7] = pixels[8] = pixels[9] = pixels[10] = pixels[11] = pixels[12] = pixels[13] = pixels[14] = pixels[15] =
+					pixels[16] = pixels[17] = pixels[18] = pixels[19] = pixels[20] = pixels[21] = pixels[22] = pixels[23] = pixels[24] = pixels[25] = pixels[26] = pixels[27] = pixels[28] = pixels[29] = PixelIntensity(0, float3(0, 0, 0));
 
-				float3 sigma[4] = {
-					{0, 0, 0},
-					{0, 0, 0},
-					{0, 0, 0},
-					{0, 0, 0}
-				};
+				for (float y = -_SamplingKernelWidth/2; y <= _SamplingKernelWidth/2; y++)
+				{
+					for (float x = -_SamplingKernelWidth/2; x <= _SamplingKernelWidth/2; x++) {
 
-				float2 start[4] = {{-_Radius, -_Radius}, {-_Radius, 0}, {0, -_Radius}, {0, 0}};
+						// Calculate the sampling UV coordinates.
+						float2 samplingUV = i.uv + float2(x, y) * _MainTex_TexelSize * (1 - depth) * _Distance;
 
-				float2 pos;
-				float3 col;
-				for (int k = 0; k < 4; k++) {
-					for (int i = 0; i <= _Radius; i++) {
-						for (int j = 0; j <= _Radius; j++) {
-							pos = float2(i, j) + start[k];
-							col = tex2Dlod(_MainTex, float4(uv + float2(pos.x * _MainTex_TexelSize.x, pos.y * _MainTex_TexelSize.y), 0., 0.)).rgb;
-							mean[k] += col;
-							sigma[k] += col * col;
-						}
+						// Sample the color
+						float3 pixelColor = tex2D(_MainTex, samplingUV).rgb;
+
+						// Calculate the color's intensity and update its struct values.
+						int intensity = floor((pixelColor.r + pixelColor.g + pixelColor.b)/3 * _ColorIntensities);
+						intensity = clamp(intensity, 0, _ColorIntensities - 1);
+						pixels[intensity].sum += pixelColor;
+						pixels[intensity].count++;
 					}
 				}
 
-				float sigma2;
-
-				float n = pow(_Radius + 1, 2);
-				float4 color = tex2D(_MainTex, uv);
-				float min = 1;
-
-				for (int l = 0; l < 4; l++) {
-					mean[l] /= n;
-					sigma[l] = abs(sigma[l] / n - mean[l] * mean[l]);
-					sigma2 = sigma[l].r + sigma[l].g + sigma[l].b;
-
-					if (sigma2 < min) {
-						min = sigma2;
-						color.rgb = mean[l].rgb;
+				// Look for the predominant color intensity
+				int currMax = 0;
+				int maxIndex = 0;
+				for (uint j = 0; j < 30; j++)
+				{
+					if (pixels[j].count > currMax) {
+						currMax = pixels[j].count;
+						maxIndex = j;
 					}
 				}
-				return color;
+
+				// Output it
+				return float4(pixels[maxIndex].sum / currMax, 1);
 			}
 			ENDCG
 		}
