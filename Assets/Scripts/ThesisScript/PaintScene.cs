@@ -78,7 +78,7 @@ public class PaintScene : MonoBehaviour {
         RenderTexture.active = rt;
         texture.ReadPixels(new UnityEngine.Rect(0, 0, Screen.width, Screen.height), 0, 0);
         texture.Apply();
-        byte[] shot = texture.EncodeToPNG();
+        byte[] shot = texture.EncodeToJPG();
 
         camera.targetTexture = null;
         RenderTexture.active = null;
@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd6.jpg"; 
+            //path = Application.persistentDataPath + "/abcd11.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -147,8 +147,6 @@ public class PaintScene : MonoBehaviour {
             System.Random rnd = new System.Random();
 
             //new grid
-            Debug.Log(texture.height);
-            Debug.Log(texture.width);
             for (int i = 0; i < texture.width; i+=3) {
                 for (int j = 0; j < texture.height; j+=3) {
                     int x = rnd.Next(-1, 2) + i;
@@ -174,15 +172,13 @@ public class PaintScene : MonoBehaviour {
             }
 
             int batch_size = 10000;
-            //Debug.Log(gradientx.get(0,0)[0]);
-            //Debug.Log(gradienty.get(0, 0)[0]);
+            Debug.Log(gridx.Count + " " + gridy.Count);
             List<Color32> pixels = new List<Color32>();
             /*//height == row, width == cols
             Color32 cpixel1 = texture.GetPixel(gridx[0], (gridy[0] - (texture.height-1))*(-1));
             double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
             Debug.Log(cpixel1);
             Debug.Log(pixel1[0] + " " + pixel1[1] + " " + pixel1[2]);*/
-            Debug.Log(color_palette.Count);
             for (int h = 0; h < index - 1; h += batch_size) {
                 pixels = new List<Color32>();
                 int endpoint = h + batch_size;
@@ -203,11 +199,24 @@ public class PaintScene : MonoBehaviour {
                     //use color of pixel
                     int cprob = rnd.Next(1, 11);
 
-                    if(cprob <= 9) {
+                    if(cprob <= 8) {
                         cpixel = pixels[cindex];
                     } else {
-                        cprob = rnd.Next(0, color_palette.Count-1);
-                        cpixel = color_palette[cprob];
+                        List<Color32> c_palette = color_palette;
+                        c_palette.Remove(pixels[cindex]);
+                        //cprob = rnd.Next(0, c_palette.Count-1);
+                        
+                        cprob = 0;
+                        double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
+                        for (int py = 0; py < c_palette.Count - 1; py++) {
+                            Color a = c_palette[py],
+                                  b = pixels[cindex];
+                            if (lowestValue > ColourDistance(a, b)) {
+                                lowestValue = ColourDistance(a, b);
+                                cprob = py;
+                            }
+                        }
+                        cpixel = c_palette[cprob];
                     }
                     cindex++;
                     //get angle
