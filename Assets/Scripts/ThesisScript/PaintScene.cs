@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd11.jpg"; 
+            //path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -179,6 +179,7 @@ public class PaintScene : MonoBehaviour {
             double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
             Debug.Log(cpixel1);
             Debug.Log(pixel1[0] + " " + pixel1[1] + " " + pixel1[2]);*/
+            double shortest = 0, longest = 0;
             for (int h = 0; h < index - 1; h += batch_size) {
                 pixels = new List<Color32>();
                 int endpoint = h + batch_size;
@@ -199,7 +200,7 @@ public class PaintScene : MonoBehaviour {
                     //use color of pixel
                     int cprob = rnd.Next(1, 11);
 
-                    if(cprob <= 8) {
+                    if(cprob <= 5) {
                         cpixel = pixels[cindex];
                     } else {
                         List<Color32> c_palette = color_palette;
@@ -207,25 +208,35 @@ public class PaintScene : MonoBehaviour {
                         //cprob = rnd.Next(0, c_palette.Count-1);
                         
                         cprob = 0;
+                        Color a , b;
                         double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
                         for (int py = 0; py < c_palette.Count - 1; py++) {
-                            Color a = c_palette[py],
-                                  b = pixels[cindex];
+                            a = c_palette[py];
+                            b = pixels[cindex];
                             if (lowestValue > ColourDistance(a, b)) {
                                 lowestValue = ColourDistance(a, b);
                                 cprob = py;
                             }
                         }
-                        cpixel = c_palette[cprob];
+                        a = c_palette[cprob];
+                         b = pixels[cindex];
+                        cpixel = (a  + b)/2;
                     }
                     cindex++;
                     //get angle
                     double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
                     double length = Math.Round(2+2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
+                    if (length < shortest)
+                        shortest = length;
+                    if(length > longest)
+                        longest = length;
+                    if (length < 5)
+                        length = 5;
                     Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 2), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
-            
+            Debug.Log("Longest : " + longest);
+            Debug.Log("Shortest : " + shortest);
             Utils.matToTexture2D(rgbaMat, texture);
             
             //OPENCV
