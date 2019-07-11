@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            //path = Application.persistentDataPath + "/abcd6.jpg"; 
+            path = Application.persistentDataPath + "/abcd1.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -200,15 +200,15 @@ public class PaintScene : MonoBehaviour {
                     //use color of pixel
                     int cprob = rnd.Next(1, 11);
 
-                    if(cprob <= 5) {
+                    if(cprob <= 4) {
                         cpixel = pixels[cindex];
                     } else {
                         List<Color32> c_palette = color_palette;
                         c_palette.Remove(pixels[cindex]);
-                        //cprob = rnd.Next(0, c_palette.Count-1);
-                        
                         cprob = 0;
+                        cprob = rnd.Next(0, c_palette.Count-1);
                         Color a , b;
+                        /*
                         double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
                         for (int py = 0; py < c_palette.Count - 1; py++) {
                             a = c_palette[py];
@@ -217,10 +217,10 @@ public class PaintScene : MonoBehaviour {
                                 lowestValue = ColourDistance(a, b);
                                 cprob = py;
                             }
-                        }
+                        }*/
                         a = c_palette[cprob];
                          b = pixels[cindex];
-                        cpixel = (a  + b)/2;
+                        cpixel = (a  + b *10)/11;
                     }
                     cindex++;
                     //get angle
