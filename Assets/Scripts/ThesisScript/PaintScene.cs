@@ -219,19 +219,23 @@ public class PaintScene : MonoBehaviour {
                             }
                         }*/
                         a = c_palette[cprob];
-                         b = pixels[cindex];
+                        b = pixels[cindex];
                         cpixel = (a  + b *10)/11;
                     }
                     cindex++;
                     //get angle
-                    double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
                     double length = Math.Round(2+2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
+                    double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
+                    
                     if (length < shortest)
                         shortest = length;
                     if(length > longest)
                         longest = length;
-                    if (length < 5)
+                    if (length <= 2 ) {
                         length = 15;
+                        angle -= 90;
+                    }
+                        
                     Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 2), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
