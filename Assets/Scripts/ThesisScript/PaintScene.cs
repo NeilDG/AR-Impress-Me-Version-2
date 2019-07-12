@@ -232,7 +232,7 @@ public class PaintScene : MonoBehaviour {
                     if(length > longest)
                         longest = length;
                     if (length <= 2 ) {
-                        length = 15;
+                        length = 10;
                         angle -= 90;
                     }
                         
