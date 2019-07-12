@@ -230,8 +230,8 @@ public class PaintScene : MonoBehaviour {
                         shortest = length;
                     if(length > longest)
                         longest = length;
-                    if (length < 10)
-                        length = 10;
+                    if (length < 5)
+                        length = 15;
                     Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 2), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
