@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd1.jpg"; 
+            path = Application.persistentDataPath + "/statue.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -113,6 +113,7 @@ public class PaintScene : MonoBehaviour {
             }//texture = ScaleTexture(texture, texture.width/2, texture.height/2);
             texture = changeColor(texture);
             
+
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
             Utils.texture2DToMat(texture, TextureMat);
@@ -221,6 +222,7 @@ public class PaintScene : MonoBehaviour {
                         a = c_palette[cprob];
                         b = pixels[cindex];
                         cpixel = (a  + b *10)/11;
+                        //cpixel = b;
                     }
                     cindex++;
                     //get angle
@@ -231,12 +233,12 @@ public class PaintScene : MonoBehaviour {
                         shortest = length;
                     if(length > longest)
                         longest = length;
-                    if (length <= 2 ) {
-                        length = 10;
-                        angle -= 90;
+                    if (length > 0 ) {
+                        //length = 10;
+                        //angle -= 90;
+                        length /= 3;
                     }
-                        
-                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 2), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
+                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 1), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
             Debug.Log("Longest : " + longest);

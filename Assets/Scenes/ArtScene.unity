@@ -3552,6 +3552,12 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -5.0000305}
   m_SizeDelta: {x: 0, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1264132865 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8385548502383933925, guid: 6095c3913a8e1bc4c8d3ff58a8a3f4e9,
+    type: 3}
+  m_PrefabInstance: {fileID: 5028475210403982995}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1372269334
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6225,7 +6231,7 @@ MonoBehaviour:
   xArrow: {fileID: 7051630699058952439}
   yArrow: {fileID: 7051630699058952433}
   zArrow: {fileID: 7051630699058952435}
-  buttonPrefab: {fileID: 0}
+  buttonPrefab: {fileID: 1264132865}
 --- !u!114 &1675197357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8306,7 +8312,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 6095c3913a8e1bc4c8d3ff58a8a3f4e9, type: 3}
 --- !u!224 &5028475210403982996 stripped
 RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5414574104581332486, guid: 6095c3913a8e1bc4c8d3ff58a8a3f4e9,
+  m_CorrespondingSourceObject: {fileID: 5253866678124823174, guid: 6095c3913a8e1bc4c8d3ff58a8a3f4e9,
     type: 3}
   m_PrefabInstance: {fileID: 5028475210403982995}
   m_PrefabAsset: {fileID: 0}
