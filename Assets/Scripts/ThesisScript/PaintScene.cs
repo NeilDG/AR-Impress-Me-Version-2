@@ -98,19 +98,23 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/statue.jpg"; 
+            path = Application.persistentDataPath + "/apple.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
-            
+            Texture2D orgTexture = new Texture2D(1, 1); ;
+            orgTexture.LoadImage(bytes);
+
             if (Screen.orientation == ScreenOrientation.Portrait) {
                 int height = texture.height / (texture.width / 480);
                 texture = ScaleTexture(texture, 480, height);
+                orgTexture = ScaleTexture(orgTexture, 480, height);
             }
             else {
                 int width = texture.width / (texture.height / 480);
                 texture = ScaleTexture(texture, width, 480);
-            }//texture = ScaleTexture(texture, texture.width/2, texture.height/2);
+                orgTexture = ScaleTexture(orgTexture, width, 480);
+            }
             texture = changeColor(texture);
             
 
@@ -175,6 +179,7 @@ public class PaintScene : MonoBehaviour {
             int batch_size = 10000;
             Debug.Log(gridx.Count + " " + gridy.Count);
             List<Color32> pixels = new List<Color32>();
+            List<Color32> orgPixels = new List<Color32>();
             /*//height == row, width == cols
             Color32 cpixel1 = texture.GetPixel(gridx[0], (gridy[0] - (texture.height-1))*(-1));
             double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
@@ -183,6 +188,7 @@ public class PaintScene : MonoBehaviour {
             double shortest = 0, longest = 0;
             for (int h = 0; h < index - 1; h += batch_size) {
                 pixels = new List<Color32>();
+                orgPixels = new List<Color32>();
                 int endpoint = h + batch_size;
                 if (endpoint > index - 1)
                     endpoint = index - 1;
@@ -190,6 +196,8 @@ public class PaintScene : MonoBehaviour {
                 for (int px = h; px < endpoint; px++) {
                     Color32 cpixel = texture.GetPixel(gridx[px], (gridy[px] - (texture.height - 1)) * (-1));
                     pixels.Add(cpixel);
+                    cpixel = orgTexture.GetPixel(gridx[px], (gridy[px] - (orgTexture.height - 1)) * (-1));
+                    orgPixels.Add(cpixel);
                 }
                 int cindex = 0;
                 for (int px = h; px < endpoint; px++) {
@@ -201,8 +209,12 @@ public class PaintScene : MonoBehaviour {
                     //use color of pixel
                     int cprob = rnd.Next(1, 11);
 
-                    if(cprob <= 4) {
-                        cpixel = pixels[cindex];
+                    if(cprob <= 10) {
+                        Color a, b;
+                        a = orgPixels[cindex];
+                        b = pixels[cindex];
+                        cpixel = (a+b)/2;
+                        //cpixel = b;
                     } else {
                         List<Color32> c_palette = color_palette;
                         c_palette.Remove(pixels[cindex]);
