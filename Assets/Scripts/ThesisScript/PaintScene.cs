@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/apple.jpg"; 
+            path = Application.persistentDataPath + "/statue.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -209,19 +209,20 @@ public class PaintScene : MonoBehaviour {
                     //use color of pixel
                     int cprob = rnd.Next(1, 11);
 
-                    if(cprob <= 10) {
+                    //if(cprob <= 10) {
                         Color a, b;
                         a = orgPixels[cindex];
                         b = pixels[cindex];
-                        cpixel = (a+b)/2;
-                        //cpixel = b;
-                    } else {
+                        //here lol
+                        cpixel = (a*2+b)/2;
+                        //cpixel = a;
+                    //} else {
+                    if (cprob > 5) {
                         List<Color32> c_palette = color_palette;
                         c_palette.Remove(pixels[cindex]);
                         cprob = 0;
                         cprob = rnd.Next(0, c_palette.Count-1);
-                        Color a , b;
-                        /*
+                        
                         double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
                         for (int py = 0; py < c_palette.Count - 1; py++) {
                             a = c_palette[py];
@@ -230,11 +231,11 @@ public class PaintScene : MonoBehaviour {
                                 lowestValue = ColourDistance(a, b);
                                 cprob = py;
                             }
-                        }*/
+                        }
                         a = c_palette[cprob];
-                        b = pixels[cindex];
-                        cpixel = (a  + b *10)/11;
-                        //cpixel = b;
+                        b = cpixel;
+                        //cpixel = (a  + b )/2;
+                        //cpixel = b*1.1f;
                     }
                     cindex++;
                     //get angle
@@ -249,6 +250,8 @@ public class PaintScene : MonoBehaviour {
                         //length = 10;
                         //angle -= 90;
                         length /= 3;
+                    } else {
+                        //length = 2;
                     }
                     Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 1), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }

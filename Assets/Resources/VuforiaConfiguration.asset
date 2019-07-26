@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: VuforiaConfiguration
   m_EditorClassIdentifier: 
   vuforia:
-    vuforiaLicenseKey: AbAyI9T/////AAABmWrXQvCs0UZ1la/I6BTuCJAhOA1X3hVwjbMC5Y+FhEyy8XVVjc1L/CKXUn15aL0ngFUxXShl1eoCvaBj1a8y5TMPclQJH4UVcKSZmn6DvCpQgqFoVKs4OKlQlk+wu/EUk6h/MsaHVGz4q1MThrEhjG2kCgVb9YHxTOykf3wg6neHgRqlv+uOUNnME06aSOE+iKHdRyNGFDOTvfZYgJ92Z5rmp4wxs/Q7KEkV1nkwKEdmU2xQ1E0Av6Zi7RAFA4yUe1i0Sro/7pTaU/yUkGprgozn7QrCsVsG8DU6QCd9ob1n2KOtRqhGkruaKV8cV2hmR+3PjXsyBhQNuuzVpxIB3g7l1BPZlKQU99aAAbCWpaYm
-    ufoLicenseKey: QWM2VUF1ai8vLy8vQUFBQUtHdUJpaG5jekV4em4rbGdOek00eUFNR2dUdEkwOERQNE5GOE9HWjBLQkdOVDZndWtNRzQ5bFM0bmhpam04d3NLKzZvN0w3dzlZM0NlNHAwWEFTRlJ2T3VYSFdWM3ZNYXdabWlid3FsV1Y5WnBxdW9ZVXQ5OXVZYjhpWUU4eW03bmlVcGVnMm14RURZYytNSUYzMjlYbmgvQUVqN2lnbk1yWjg3Rkp6SjduT2JyUkY4YTZubzZSMS9tZThSOFo5eFBoWHpzTkcwV0R1KzFYVWlabFRXSkxJbU5rS05IeDNZSDFxNTgzTnhaaGRBQTFRRWtkcGJNREkwM0Z3VzdZNjFEa1FjWnpFQlR6bEo5RHUzQS9VZ21JL3ZJbzZqRjZ3TVJabDdoeGh3QUM5U3N1eFhWekt5dmNncFRxS1lUREJCcU05cks4emRRVTBiUnlPaXlXclFjclZIb0NsMERkeVVjL2hodFhpWk5rUjY=
+    vuforiaLicenseKey: 
+    ufoLicenseKey: QWE4VGxKdi8vLy8vQUFBQUtCUTVTVk53TkVCZnE0R3VpZGJ0RlU0RnY0UnF4ZTU0MHdndkxKb2VKR2R0Y0NlMW9GMElQeWlCQVNDekdOT3RnRHQ3RlNod1NwNW1rb2VIdlg2NEx0RGYxM1hkbDBIVzYwRHhtU3BCWFJiMy96aFZxOXFLaGJ5M05jS2oyRDh3V0FsNkRGZ3RPY0VMTzVmT3p0bVN0dXRoak5wV2VldUNoaG13NHpTaThWYXRPRm82elBCUUVNTHFKa2lKeUZDbExWL0FzZ1NPQUZiRngxcmM4QkxlUDRsNG81L3dJMm5TMjN1MlEyK3l4WFFweFcxckFsRmQxODJWYWYreVBxdlVFcE92ZUJWNWdackdkWERXRW4xNVdSWUxSaDBHc0NXb1VtMEliNTI5RXhZSXcwYWJqdkwxQXl3OFNJMDRRR2xUQ3VWSkNtSGE3RUVaL20rdmhsTTNvdGtnZm1vOTFjVkZOOXhtMEx5U2doWTA=
     delayedInitialization: 0
     cameraDeviceModeSetting: -1
     maxSimultaneousImageTargets: 1
-    maxSimultaneousObjectTargets: 5
+    maxSimultaneousObjectTargets: 1
     useDelayedLoadingObjectTargets: 0
     cameraDirection: 0
     mirrorVideoBackground: 0
@@ -53,8 +53,7 @@ MonoBehaviour:
     matteShader: {fileID: 4800000, guid: 66d0d78a3000021448b598bb54a3bfdf, type: 3}
     videoBackgroundEnabled: 1
   deviceTracker:
-    autoInitTracker: 1
-    autoStartTracker: 1
+    autoStartTracker: 0
     trackingMode: 1
     posePrediction: 0
     modelCorrectionMode: 0
