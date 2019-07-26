@@ -214,7 +214,7 @@ public class PaintScene : MonoBehaviour {
                         a = orgPixels[cindex];
                         b = pixels[cindex];
                         //here lol
-                        cpixel = (a*2+b)/2;
+                        cpixel = (a*2+b)/3;
                         //cpixel = a;
                     //} else {
                     if (cprob > 5) {
