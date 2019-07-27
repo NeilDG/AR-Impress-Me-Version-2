@@ -98,7 +98,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/statue.jpg"; 
+            path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -185,7 +185,7 @@ public class PaintScene : MonoBehaviour {
             double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
             Debug.Log(cpixel1);
             Debug.Log(pixel1[0] + " " + pixel1[1] + " " + pixel1[2]);*/
-            double shortest = 0, longest = 0;
+            double shortest = 50, longest = 0, angleShort = 0;
             for (int h = 0; h < index - 1; h += batch_size) {
                 pixels = new List<Color32>();
                 orgPixels = new List<Color32>();
@@ -210,54 +210,68 @@ public class PaintScene : MonoBehaviour {
                     int cprob = rnd.Next(1, 11);
 
                     //if(cprob <= 10) {
-                        Color a, b;
-                        a = orgPixels[cindex];
-                        b = pixels[cindex];
-                        //here lol
-                        cpixel = (a*2+b)/3;
-                        //cpixel = a;
+                    Color a, b;
+                    a = orgPixels[cindex];
+                    b = pixels[cindex];
+                    //here lol
+                    cpixel = (a+b*2)/3;
+                    //cpixel = a;
                     //} else {
-                    if (cprob > 5) {
-                        List<Color32> c_palette = color_palette;
-                        c_palette.Remove(pixels[cindex]);
-                        cprob = 0;
-                        cprob = rnd.Next(0, c_palette.Count-1);
-                        
-                        double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
-                        for (int py = 0; py < c_palette.Count - 1; py++) {
-                            a = c_palette[py];
-                            b = pixels[cindex];
-                            if (lowestValue > ColourDistance(a, b)) {
-                                lowestValue = ColourDistance(a, b);
-                                cprob = py;
-                            }
+                    //if (cprob > 5) {
+                    List<Color32> c_palette = color_palette;
+                    c_palette.Remove(pixels[cindex]);
+                    cprob = 0;
+                    cprob = rnd.Next(0, c_palette.Count-1);
+                    /*
+                    double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
+                    for (int py = 0; py < c_palette.Count - 1; py++) {
+                        a = c_palette[py];
+                        b = pixels[cindex];
+                        if (lowestValue > ColourDistance(a, b)) {
+                            lowestValue = ColourDistance(a, b);
+                            cprob = py;
                         }
-                        a = c_palette[cprob];
-                        b = cpixel;
-                        //cpixel = (a  + b )/2;
-                        //cpixel = b*1.1f;
-                    }
+                    }*/
+                    a = c_palette[cprob];
+                    b = cpixel;
+                    //cpixel = (a  + b )/2;
+                    //cpixel = b*1.1f;
+                        
+                    
+                    //cpixel = a;
+
+                    //}
                     cindex++;
                     //get angle
                     double length = Math.Round(2+2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
                     double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
-                    
-                    if (length < shortest)
+                    double lengthb = 1;
+                    if (length < shortest) {
                         shortest = length;
+                        angleShort = angle;
+                    }
                     if(length > longest)
                         longest = length;
-                    if (length > 0 ) {
-                        //length = 10;
-                        //angle -= 90;
+                    if (length > 2 && angle != 90) {
                         length /= 3;
                     } else {
-                        //length = 2;
+                        angle += 80;
+                        length = 10;
+                        lengthb = 2;
+                        float H, S, V;
+                        Color.RGBToHSV(b, out H, out S, out V);
+                        float sat = cprob * 0.01f;
+                        sat += 1;
+                        S *= sat;
+                        cpixel = Color.HSVToRGB(H, S, V);
                     }
-                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, 1), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
+                   
+                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, lengthb), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
             Debug.Log("Longest : " + longest);
             Debug.Log("Shortest : " + shortest);
+            Debug.Log("Angle : " + angleShort);
             Utils.matToTexture2D(rgbaMat, texture);
             
             //OPENCV
@@ -486,7 +500,7 @@ public class PaintScene : MonoBehaviour {
                 color_palette.Add(cpixel);
             }
 
-            /*
+            
             //Perlin Noise Filter
             float seed = (mixed.r + mixed.g + mixed.b)/3, 
                   noisex, noisey, nx = 0f, ny = 0f;
@@ -518,7 +532,7 @@ public class PaintScene : MonoBehaviour {
                     rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
 
             }
-            else {*//*
+            else {*/
                 nx = 0.05f;
                 ny = 0.1f;
                 noisex = width * nx / gradientx;
@@ -538,8 +552,8 @@ public class PaintScene : MonoBehaviour {
                 
 
                 if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    //rpixels[px] = (rpixels[px] * 10 + IvoryBlack) / 11;
-            //} */
+                    //rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
+            //} 
 
             //rpixels[px] *= 1.5f;
             /*
@@ -549,12 +563,12 @@ public class PaintScene : MonoBehaviour {
                 height = source.height;
             }*/
 
-            /*
+            
             width += 1f;
             if (width % source.width == 0) {
                 width = 0;
                 height += 1f;
-            } */
+            } 
             
  
         }
