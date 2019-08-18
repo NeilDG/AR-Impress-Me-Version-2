@@ -43,6 +43,7 @@ public class PaintScene : MonoBehaviour {
     }
 
     private IEnumerator Paint() {
+        /*
         //OPENCV
         webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
 
@@ -52,6 +53,7 @@ public class PaintScene : MonoBehaviour {
         #endif
         webCamTextureToMatHelper.Initialize();
         //OPENCV
+        */
 
         objectMan.reset();
         myCanvas.enabled = false;
@@ -117,7 +119,7 @@ public class PaintScene : MonoBehaviour {
             }
             texture = changeColor(texture);
             
-
+            
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
             Utils.texture2DToMat(texture, TextureMat);
@@ -180,11 +182,6 @@ public class PaintScene : MonoBehaviour {
             Debug.Log(gridx.Count + " " + gridy.Count);
             List<Color32> pixels = new List<Color32>();
             List<Color32> orgPixels = new List<Color32>();
-            /*//height == row, width == cols
-            Color32 cpixel1 = texture.GetPixel(gridx[0], (gridy[0] - (texture.height-1))*(-1));
-            double[] pixel1 = TextureMat.get(gridy[0], gridx[0]);
-            Debug.Log(cpixel1);
-            Debug.Log(pixel1[0] + " " + pixel1[1] + " " + pixel1[2]);*/
             double shortest = 50, longest = 0, angleShort = 0;
             for (int h = 0; h < index - 1; h += batch_size) {
                 pixels = new List<Color32>();
@@ -214,7 +211,7 @@ public class PaintScene : MonoBehaviour {
                     a = orgPixels[cindex];
                     b = pixels[cindex];
                     //here lol
-                    cpixel = (a+b*2)/3;
+                    cpixel = (a*2+b)/3;
                     //cpixel = a;
                     //} else {
                     //if (cprob > 5) {
@@ -222,16 +219,6 @@ public class PaintScene : MonoBehaviour {
                     c_palette.Remove(pixels[cindex]);
                     cprob = 0;
                     cprob = rnd.Next(0, c_palette.Count-1);
-                    /*
-                    double lowestValue = ColourDistance(c_palette[cprob], pixels[cindex]);
-                    for (int py = 0; py < c_palette.Count - 1; py++) {
-                        a = c_palette[py];
-                        b = pixels[cindex];
-                        if (lowestValue > ColourDistance(a, b)) {
-                            lowestValue = ColourDistance(a, b);
-                            cprob = py;
-                        }
-                    }*/
                     a = c_palette[cprob];
                     b = cpixel;
                     //cpixel = (a  + b )/2;
@@ -265,7 +252,6 @@ public class PaintScene : MonoBehaviour {
                         S *= sat;
                         cpixel = Color.HSVToRGB(H, S, V);
                     }
-                   
                     Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, lengthb), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
                 }
             }
@@ -499,78 +485,7 @@ public class PaintScene : MonoBehaviour {
             if (!color_palette.Contains(cpixel)) {
                 color_palette.Add(cpixel);
             }
-
-            
-            //Perlin Noise Filter
-            float seed = (mixed.r + mixed.g + mixed.b)/3, 
-                  noisex, noisey, nx = 0f, ny = 0f;
-            //nx = 0.01f;
-            //if(seed > 0.5)
-                //ny = 0.01f; 
-            //else ny = 0.1f;
-
-            nx = 0.1f;
-            ny = 0.5f;
-            noisex = width * nx; 
-            noisey = height * ny;
-
-            if (Mathf.PerlinNoise(noisex, noisey) < 0.3f)
-                //rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
-            
-            /*if (seed > 0.5) {
-                nx = 0.01f;
-                ny = 0.01f;
-                noisex = width * nx + (seed * 10);
-                noisey = height * ny + (seed * 10);
-                //noisey /= (height * ny); // gets shorter as it goes down
-                //noisey -= (height * ny); //straight lines
-                
-                noisex += height; //straight down
-                noisex += height * (width/source.width);
-
-                if (Mathf.PerlinNoise(noisex, noisey) < 0.4f)
-                    rpixels[px] = (rpixels[px] + rpixels[px] + IvoryBlack)/3;
-
-            }
-            else {*/
-                nx = 0.05f;
-                ny = 0.1f;
-                noisex = width * nx / gradientx;
-                noisey = height * ny * gradienty;
-                //noisex = width * nx / 4f;
-                //noisey = height * ny * 2.5f;
-                gradientx -= 0.00000005f;
-                gradienty += 0.000005f;
-                
-                
-                //noisex += (height * 2); //sideways
-                //noisex += height; //straight down
-                //noisex += width * (height / source.height);
-
-                noisex += (height * nx);
-                noisey += (width * ny /  8);
-                
-
-                if (Mathf.PerlinNoise(noisex, noisey) < 0.5f)
-                    //rpixels[px] = (rpixels[px] * 10 + LeadWhite) / 11;
-            //} 
-
             //rpixels[px] *= 1.5f;
-            /*
-            height -= 1f;
-            if(height == (source.height - source.width)) {
-                width -= 1;
-                height = source.height;
-            }*/
-
-            
-            width += 1f;
-            if (width % source.width == 0) {
-                width = 0;
-                height += 1f;
-            } 
-            
- 
         }
         //Debug.Log(gradientx + " " + gradienty);
         source.SetPixels(rpixels, 0);
