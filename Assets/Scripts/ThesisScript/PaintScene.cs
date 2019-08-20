@@ -306,7 +306,7 @@ public class PaintScene : MonoBehaviour {
             int colorIndex = -1;
 
             //First Color Detection
-            for (int x = 1; x < 8; x++) {
+            for (int x = 0; x < 9; x++) {
                 if(lowestValue > HSVDistanceCompare(palette[x], rpixels[px]) || colorIndex == -1) {
                     lowestValue = HSVDistanceCompare(palette[x], rpixels[px]);
                     colorIndex = x;
@@ -320,8 +320,8 @@ public class PaintScene : MonoBehaviour {
                 if (colorIndex != x) {
                     Color a = mixed,
                           b = palette[x];
-                    if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
-                        lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
+                    if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px])) {
+                        lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px]);
                         colorIndex = x;
                     }
                 }
@@ -374,7 +374,7 @@ public class PaintScene : MonoBehaviour {
         float H1, S1, V1, H2, S2, V2;
         Color.RGBToHSV(e1, out H1, out S1, out V1);
         Color.RGBToHSV(e2, out H2, out S2, out V2);
-        Vector3 x = new Vector3(H1, S1, V2);
+        Vector3 x = new Vector3(H1, S1, V1);
         Vector3 y = new Vector3(H2, S2, V2);
 
         return Vector3.Distance(x, y);
