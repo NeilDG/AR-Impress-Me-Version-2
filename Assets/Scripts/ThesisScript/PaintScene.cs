@@ -100,7 +100,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd6.jpg"; 
+            path = Application.persistentDataPath + "/abcd1.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -117,8 +117,8 @@ public class PaintScene : MonoBehaviour {
                 texture = ScaleTexture(texture, width, 480);
                 orgTexture = ScaleTexture(orgTexture, width, 480);
             }
-            texture = changeColor(texture);
-            
+            int pnum = 0;
+            texture = changeColor(texture, pnum);
             
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
@@ -211,7 +211,7 @@ public class PaintScene : MonoBehaviour {
                     a = orgPixels[cindex];
                     b = pixels[cindex];
                     //here lol
-                    cpixel = (a*2+b)/3;
+                    cpixel = (a+b)/2;
                     //cpixel = a;
                     //} else {
                     //if (cprob > 5) {
@@ -293,8 +293,54 @@ public class PaintScene : MonoBehaviour {
         result.Apply();
         return result;
     }
+    
+    private Texture2D changeColor(Texture2D source, int pnum) {
+        Color[] palette = getPalette(pnum);
 
-    Color LeadWhite = new Color(0.8627f, 0.8588f, 0.8392f),
+        Color[] rpixels = source.GetPixels(0);
+        Color mixed = new Color();
+        Debug.Log(rpixels.Length);
+
+        for (int px = 0; px < rpixels.Length; px++) {
+            double lowestValue = 0;
+            int colorIndex = -1;
+
+            //First Color Detection
+            for (int x = 1; x < 8; x++) {
+                if(lowestValue > HSVDistanceCompare(palette[x], rpixels[px]) || colorIndex == -1) {
+                    lowestValue = HSVDistanceCompare(palette[x], rpixels[px]);
+                    colorIndex = x;
+                }
+            }
+            
+            mixed = palette[colorIndex];
+
+            //Color Mixing
+            for (int x = 0; x < 9; x++) {
+                if (colorIndex != x) {
+                    Color a = mixed,
+                          b = palette[x];
+                    if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
+                        lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
+                        colorIndex = x;
+                    }
+                }
+            }
+            mixed = (mixed + palette[colorIndex]) / 2;
+            
+            rpixels[px] = mixed;
+            Color32 cpixel = mixed;
+            if (!color_palette.Contains(cpixel)) {
+                color_palette.Add(cpixel);
+            }
+            //rpixels[px] *= 1.5f;
+        }
+        source.SetPixels(rpixels, 0);
+        source.Apply();
+        return source;
+    }
+
+     Color LeadWhite = new Color(0.8627f, 0.8588f, 0.8392f),
           CadiumYellow = new Color(1.0f, 0.965f, 0.0f),
           ViridianGreen = new Color(0.251f, 0.51f, 0.427f),
           EmeraldGreen = new Color(0.314f, 0.784f, 0.471f),
@@ -304,193 +350,34 @@ public class PaintScene : MonoBehaviour {
           VermilionRed = new Color(0.89f, 0.259f, 0.204f),
           IvoryBlack = new Color(0.16f, 0.14f, 0.13f);
 
-    private Texture2D changeColor(Texture2D source) {
-        Color[] palette = new Color[9];
-        palette[0] = LeadWhite;
-        palette[1] = CadiumYellow;
-        palette[2] = ViridianGreen;
-        palette[3] = EmeraldGreen;
-        palette[4] = FrenchUltramarine;
-        palette[5] = CobaltBlue;
-        palette[6] = AlizarinCrimson;
-        palette[7] = VermilionRed;
-        palette[8] = IvoryBlack;
-
-        Color[] rpixels = source.GetPixels(0);
-        float width = 0f/* source.width*/,
-             height = 0f/*source.height*/,
-             gradientx = 4f,
-             gradienty = 2.5f;
-            
-        Color mixed = new Color();
-
-        Debug.Log(rpixels.Length);
-
-        for (int px = 0; px < rpixels.Length; px++) {
-            double lowestValue = 0;
-            int colorIndex = -1, bwIndex = -1;
-            Boolean bdeeper = false, wdeeper = false, mix = false;
-            
-
-            //First Color Detection
-            for (int x = 0; x < 9; x++) {
-                if(lowestValue > ColourDistance(palette[x], rpixels[px]) || colorIndex == -1) {
-                    lowestValue = ColourDistance(palette[x], rpixels[px]);
-                    colorIndex = x;
-                }
-            }
-            
-            float H, S, V;
-            Color.RGBToHSV(rpixels[px], out H, out S, out V);
-            double B = (Math.Pow(rpixels[px].r * 0.299f, 2) + Math.Pow(rpixels[px].g * 0.587f,2) + Math.Pow(rpixels[px].b * 0.114f, 2)) / 255;
-            if (colorIndex == 0 || colorIndex == 8) {
-                mixed = palette[colorIndex];
-                mix = true;
-                //GreyScale Balck/White detection
-                double bwlowestValue = 0;
-                for (int x = 0; x < 9; x++) {
-                    if (bwlowestValue > ColourDistanceGreyScale(palette[x], rpixels[px]) || bwIndex == -1) {
-                        bwlowestValue = ColourDistanceGreyScale(palette[x], rpixels[px]);
-                        bwIndex = x;
-                    }
-                }
-                if (bwIndex == 0)
-                    wdeeper = true;
-                else if(bwIndex == 8)
-                    bdeeper = true;
-                /*
-                //Color Mixing
-                int prev = colorIndex;
-                for (int x = 0; x < 9; x++) {
-                    if (colorIndex != x) {
-                        Color a = palette[colorIndex],
-                              b = palette[x];
-                        if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
-                            lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
-                            mixed = (a + b) / 2;
-                            prev = 9;
-                        }
-                    }
-                }
-                colorIndex = prev;*/
-            }
-            //else {
-                //First Color Detection
-                float deg = H * 360;
-                double c1, c2;
-                if ((deg >= 0 && deg < 30) || (deg >= 270 && deg < 330)) {
-                    c1 = ColourDistance(AlizarinCrimson, rpixels[px]);
-                    c2 = ColourDistance(VermilionRed, rpixels[px]);
-                    if(c1 < c2) {
-                        lowestValue = ColourDistance(AlizarinCrimson, rpixels[px]);
-                        colorIndex = 6;
-                    } else {
-                        lowestValue = ColourDistance(VermilionRed, rpixels[px]);
-                        colorIndex = 7;
-                    }
-                }
-                else if (deg >= 30 && deg < 90) {
-                    lowestValue = ColourDistance(CadiumYellow, rpixels[px]);
-                    colorIndex = 1;
-                }
-                else if (deg >= 90 && deg < 150) {
-                    c1 = ColourDistance(EmeraldGreen, rpixels[px]);
-                    c2 = ColourDistance(ViridianGreen, rpixels[px]);
-                    if (c1 < c2) {
-                        lowestValue = ColourDistance(EmeraldGreen, rpixels[px]);
-                        colorIndex = 3;
-                    }
-                    else {
-                        lowestValue = ColourDistance(ViridianGreen, rpixels[px]);
-                        colorIndex = 2;
-                    }
-                }
-                else if (deg >= 150 && deg < 270) {
-                    c1 = ColourDistance(CobaltBlue, rpixels[px]);
-                    c2 = ColourDistance(FrenchUltramarine, rpixels[px]);
-                    if (c1 < c2) {
-                        lowestValue = ColourDistance(CobaltBlue, rpixels[px]);
-                        colorIndex = 5;
-                    }
-                    else {
-                        lowestValue = ColourDistance(FrenchUltramarine, rpixels[px]);
-                        colorIndex = 4;
-                    }
-                }
-                else {
-                    c1 = ColourDistance(AlizarinCrimson, rpixels[px]);
-                    c2 = ColourDistance(VermilionRed, rpixels[px]);
-                    if (c1 < c2) {
-                        lowestValue = ColourDistance(AlizarinCrimson, rpixels[px]);
-                        colorIndex = 6;
-                    }
-                    else {
-                        lowestValue = ColourDistance(VermilionRed, rpixels[px]);
-                        colorIndex = 7;
-                    }
-                }
-            //}
-            
-            
-            if(colorIndex != 9) {
-                //if (mix) {
-                    //mixed = (mixed + palette[colorIndex]) / 2;
-                //}
-                //else 
-                    mixed = palette[colorIndex];
-
-                //Color Mixing
-                for (int x = 0; x < 9; x++) {
-                    if (colorIndex != x) {
-                        Color a = mixed,
-                              b = palette[x];
-                        if (lowestValue > ColourDistance((a + b) / 2, rpixels[px])) {
-                            lowestValue = ColourDistance((a + b) / 2, rpixels[px]);
-                            colorIndex = x;
-                        }
-                    }
-                }
-                mixed = (mixed + palette[colorIndex]) / 2;
-            }
-                
-            //GrayScale Deepener
-            if (bdeeper) {
-                mixed = (mixed + mixed + IvoryBlack) / 3;
-            }
-            else if (wdeeper) {
-                mixed = (mixed + mixed + LeadWhite) / 3;
-            }
-
-
-
-            //Black and White Darkener
-
-            if (S < 0.1 && B > 0.9) {
-                /*while (lowestValue > ColourDistance((mixed + LeadWhite)/2, rpixels[px])) {
-                    mixed = (mixed + LeadWhite)/2;
-                    lowestValue = ColourDistance(mixed, rpixels[px]);
-                }*/
-                
-            }
-            else if (B < 0.1) {
-               /* while (lowestValue > ColourDistance((mixed + IvoryBlack)/2, rpixels[px])) {
-                    mixed = (mixed + IvoryBlack)/2;
-                    lowestValue = ColourDistance(mixed, rpixels[px]);
-                }*/
-            }
-
-            
-            rpixels[px] = mixed;
-            Color32 cpixel = mixed;
-            if (!color_palette.Contains(cpixel)) {
-                color_palette.Add(cpixel);
-            }
-            //rpixels[px] *= 1.5f;
+    public Color[] getPalette(int num) {
+        if(num == 1) {
+            Color[] palette = new Color[9];
+            return palette;
+        } else {
+            Color[] palette = new Color[9];
+            palette[0] = LeadWhite;
+            palette[1] = CadiumYellow;
+            palette[2] = ViridianGreen;
+            palette[3] = EmeraldGreen;
+            palette[4] = FrenchUltramarine;
+            palette[5] = CobaltBlue;
+            palette[6] = AlizarinCrimson;
+            palette[7] = VermilionRed;
+            palette[8] = IvoryBlack;
+            return palette;
         }
-        //Debug.Log(gradientx + " " + gradienty);
-        source.SetPixels(rpixels, 0);
-        source.Apply();
-        return source;
+        
+    }
+
+    public static double HSVDistanceCompare(Color e1, Color e2) {
+        float H1, S1, V1, H2, S2, V2;
+        Color.RGBToHSV(e1, out H1, out S1, out V1);
+        Color.RGBToHSV(e2, out H2, out S2, out V2);
+        Vector3 x = new Vector3(H1, S1, V2);
+        Vector3 y = new Vector3(H2, S2, V2);
+
+        return Vector3.Distance(x, y);
     }
 
     public static double ColourDistanceGreyScale(Color e1, Color e2) {
