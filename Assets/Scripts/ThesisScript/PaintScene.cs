@@ -100,7 +100,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/abcd1.jpg"; 
+            path = Application.persistentDataPath + "/abcd6.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -117,15 +117,32 @@ public class PaintScene : MonoBehaviour {
                 texture = ScaleTexture(texture, width, 480);
                 orgTexture = ScaleTexture(orgTexture, width, 480);
             }
-            int pnum = 0;
-            texture = changeColor(texture, pnum);
+            //OPENCV Color Picker
+            Mat OrgTextureMat = new Mat(orgTexture.height, orgTexture.width, CvType.CV_8UC4);
+            Utils.texture2DToMat(orgTexture, OrgTextureMat);
+
+
+            Mat samples = OrgTextureMat.reshape(1, OrgTextureMat.cols() * OrgTextureMat.rows());
+            Mat samples32f = new Mat();
+            samples.convertTo(samples32f, CvType.CV_32F, 1.0 / 255.0);
+
+            Mat labels = new Mat();
+            TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
+            Mat centers = new Mat();
+            Core.kmeans(samples32f, 10, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
+
+            Debug.Log(centers);
+            Debug.Log(centers.rows());
+            Debug.Log(centers.cols());
+
+            texture = changeColor(texture, centers);
             
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
             Utils.texture2DToMat(texture, TextureMat);
             
-            Mat label = new Mat(texture.height, texture.width, CvType.CV_8UC1);
             //Get KMEANS
+            //Mat label = new Mat(texture.height, texture.width, CvType.CV_8UC1);
             //TermCriteria tc = new TermCriteria(TermCriteria.EPS, 10, 1);
             //Core.kmeans(TextureMat, 20, label, tc, 10, Core.KMEANS_PP_CENTERS);
 
@@ -294,8 +311,8 @@ public class PaintScene : MonoBehaviour {
         return result;
     }
     
-    private Texture2D changeColor(Texture2D source, int pnum) {
-        Color[] palette = getPalette(pnum);
+    private Texture2D changeColor(Texture2D source, Mat centers) {
+        Color[] palette = getPalette(centers);
 
         Color[] rpixels = source.GetPixels(0);
         Color mixed = new Color();
@@ -327,7 +344,7 @@ public class PaintScene : MonoBehaviour {
                 }
             }
             mixed = (mixed + palette[colorIndex]) / 2;
-            
+
             rpixels[px] = mixed;
             Color32 cpixel = mixed;
             if (!color_palette.Contains(cpixel)) {
@@ -340,31 +357,79 @@ public class PaintScene : MonoBehaviour {
         return source;
     }
 
-     Color LeadWhite = new Color(0.8627f, 0.8588f, 0.8392f),
-          CadiumYellow = new Color(1.0f, 0.965f, 0.0f),
-          ViridianGreen = new Color(0.251f, 0.51f, 0.427f),
-          EmeraldGreen = new Color(0.314f, 0.784f, 0.471f),
-          FrenchUltramarine = new Color(0.071f, 0.039f, 0.561f),
-          CobaltBlue = new Color(0.0f, 0.278f, 0.671f),
-          AlizarinCrimson = new Color(0.89f, 0.149f, 0.212f),
-          VermilionRed = new Color(0.89f, 0.259f, 0.204f),
-          IvoryBlack = new Color(0.16f, 0.14f, 0.13f);
+    public Color[] getPalette(Mat centers) {
+        /*
+        String text = System.IO.File.ReadAllText(@"C:\Users\Gary Non\Desktop\palettes.txt");
+        String newCode = "";
+        bool inDec = false;
+        int decNum = 0;
+        int elemNum = 0;
+        String curNum = "";
+        int curParam = 1;
+        float b = 0, g = 0, r = 0;
+        for(int x = 1; x< text.Length; x++) {
+            if(text[x] == ':' && char.IsDigit(text[x-1])) {
+                decNum += 1;
+                elemNum = 0;
+                newCode += "Color[] palette"+decNum+ " = new Color[10];\n";
+            } 
+            if(text[x] == '[') {
+                inDec = true;
+                newCode += "palette" + decNum + "["+ elemNum +"] = new Color(";
+                elemNum += 1;
+            }
+            if (inDec) {
+                if (char.IsDigit(text[x]) || text[x] == '.') {
+                    Debug.Log("BRUH1\n");
+                    curNum += text[x];
+                }
+                else if(text[x] == ']' && inDec) {
+                    Debug.Log("BRO3\n");
+                    if (!curNum.Equals("")) {
+                        r = float.Parse(curNum);
+                        curNum = "";
+                        curParam = 1;
+                    }
+                    newCode += r / 256+"f, " + g / 256 + "f, " + b / 256 + "f " + ");\n";
+                    inDec = false;
+                }
+                else {
+                    Debug.Log("bruh2\n");
+                    if (curParam == 1) {
+                        if(!curNum.Equals("")) {
+                            b = float.Parse(curNum);
+                            curNum = "";
+                            curParam += 1;
+                        }
+                    } else if(curParam == 2) {
+                        if (!curNum.Equals("")) {
+                            g = float.Parse(curNum);
+                            curNum = "";
+                            curParam += 1;
+                        }
+                    }
+                } 
+            }
+            
+            
+        }
+        Debug.Log(newCode);*/
 
-    public Color[] getPalette(int num) {
-        if(num == 1) {
+        int num = 0;
+        if (num == 1) {
             Color[] palette = new Color[9];
             return palette;
         } else {
             Color[] palette = new Color[9];
-            palette[0] = LeadWhite;
-            palette[1] = CadiumYellow;
-            palette[2] = ViridianGreen;
-            palette[3] = EmeraldGreen;
-            palette[4] = FrenchUltramarine;
-            palette[5] = CobaltBlue;
-            palette[6] = AlizarinCrimson;
-            palette[7] = VermilionRed;
-            palette[8] = IvoryBlack;
+            palette[0] = new Color(0.8627f, 0.8588f, 0.8392f); //LeadWhite;
+            palette[1] = new Color(1.0f, 0.965f, 0.0f); //CadiumYellow;
+            palette[2] = new Color(0.251f, 0.51f, 0.427f); //ViridianGreen;
+            palette[3] = new Color(0.314f, 0.784f, 0.471f); //EmeraldGreen;
+            palette[4] = new Color(0.071f, 0.039f, 0.561f); //FrenchUltramarine;
+            palette[5] = new Color(0.0f, 0.278f, 0.671f); //CobaltBlue;
+            palette[6] = new Color(0.89f, 0.149f, 0.212f); //AlizarinCrimson;
+            palette[7] = new Color(0.89f, 0.259f, 0.204f); //VermilionRed;
+            palette[8] = new Color(0.16f, 0.14f, 0.13f); //IvoryBlack;
             return palette;
         }
         
