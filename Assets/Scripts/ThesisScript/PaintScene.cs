@@ -100,7 +100,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/bsample.jpg"; 
+            path = Application.persistentDataPath + "/Buda_Flower.jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -322,11 +322,11 @@ public class PaintScene : MonoBehaviour {
     
 
         for (int px = 0; px < rpixels.Length; px++) {
-            double lowestValue = 0;
+            double lowestValue = 1000;
             int colorIndex = -1;
 
             //First Color Detection
-            for (int x = 0; x < 9; x++) {
+            for (int x = 0; x < 10; x++) {
                 if(lowestValue > HSVDistanceCompare(palette[x], rpixels[px]) || colorIndex == -1) {
                     lowestValue = HSVDistanceCompare(palette[x], rpixels[px]);
                     colorIndex = x;
@@ -335,34 +335,27 @@ public class PaintScene : MonoBehaviour {
             
             mixed = palette[colorIndex];
 
-            //Color Mixing
-            for (int x = 0; x < 9; x++) {
-                if (colorIndex != x) {
-                    Color a = mixed,
-                          b = palette[x];
-                    if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px])) {
-                        lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px]);
-                        colorIndex = x;
-                    }
-                }
-            }
-            mixed = (mixed + palette[colorIndex]) / 2;
+            //Numer of times to mix
+            int numColorsToMix = 2;
 
             //Color Mixing
-            for (int x = 0; x < 9; x++)
+            for (int m = 0; m < numColorsToMix - 1; m++)
             {
-                if (colorIndex != x)
+                for (int x = 0; x < 10; x++)
                 {
-                    Color a = mixed,
-                          b = palette[x];
-                    if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px]))
+                    if (colorIndex != x)
                     {
-                        lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px]);
-                        colorIndex = x;
+                        Color a = mixed,
+                              b = palette[x];
+                        if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px]))
+                        {
+                            lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px]);
+                            colorIndex = x;
+                        }
                     }
                 }
+                mixed = (mixed + palette[colorIndex]) / 2;
             }
-            mixed = (mixed + palette[colorIndex]) / 2;
 
             rpixels[px] = mixed;
             Color32 cpixel = mixed;
@@ -405,16 +398,17 @@ public class PaintScene : MonoBehaviour {
             Color[] palette = new Color[10];
             return palette;
         } else {
-            Color[] palette = new Color[9];
+            Color[] palette = new Color[10];
             palette[0] = new Color(0.8627f, 0.8588f, 0.8392f); //LeadWhite;
             palette[1] = new Color(1.0f, 0.965f, 0.0f); //CadiumYellow;
-            palette[2] = new Color(0.251f, 0.51f, 0.427f); //ViridianGreen;
-            palette[3] = new Color(0.314f, 0.784f, 0.471f); //EmeraldGreen;
-            palette[4] = new Color(0.071f, 0.039f, 0.561f); //FrenchUltramarine;
-            palette[5] = new Color(0.0f, 0.278f, 0.671f); //CobaltBlue;
-            palette[6] = new Color(0.89f, 0.149f, 0.212f); //AlizarinCrimson;
-            palette[7] = new Color(0.89f, 0.259f, 0.204f); //VermilionRed;
-            palette[8] = new Color(0.16f, 0.14f, 0.13f); //IvoryBlack;
+            palette[2] = new Color(0.968f, 0.917f, 0.0f); //Chrome Yellow;
+            palette[3] = new Color(0.251f, 0.51f, 0.427f); //ViridianGreen;
+            palette[4] = new Color(0.314f, 0.784f, 0.471f); //EmeraldGreen;
+            palette[5] = new Color(0.071f, 0.039f, 0.561f); //FrenchUltramarine;
+            palette[6] = new Color(0.0f, 0.278f, 0.671f); //CobaltBlue;
+            palette[7] = new Color(0.89f, 0.149f, 0.212f); //AlizarinCrimson;
+            palette[8] = new Color(0.89f, 0.259f, 0.204f); //VermilionRed;
+            palette[9] = new Color(0.16f, 0.14f, 0.13f); //IvoryBlack;
             return palette;
         }
         
@@ -671,7 +665,12 @@ public class PaintScene : MonoBehaviour {
         Color.RGBToHSV(e2, out H2, out S2, out V2);
         Vector3 x = new Vector3(H1, S1, V1);
         Vector3 y = new Vector3(H2, S2, V2);
+        /*
+        LABColor lab1 = LABColor.FromColor(e1);
+        LABColor lab2 = LABColor.FromColor(e2);
 
+        return LABColor.Distance(lab1, lab2);
+        //*/
         return Vector3.Distance(x, y);
     }
 
