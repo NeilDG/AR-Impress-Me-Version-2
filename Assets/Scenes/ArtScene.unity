@@ -6172,6 +6172,9 @@ MonoBehaviour:
   backButton: {fileID: 974259096}
   image: {fileID: 2077014492}
   myCanvas: {fileID: 223762454002940833}
+  numColorsToMix: 2
+  lever: 1
+  imageName: bsample
   loadingScreen: {fileID: 390755258}
 --- !u!4 &1675197355
 Transform:

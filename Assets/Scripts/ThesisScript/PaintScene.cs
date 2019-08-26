@@ -20,6 +20,10 @@ public class PaintScene : MonoBehaviour {
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
 
+    [SerializeField] private int numColorsToMix =2;
+    [SerializeField] private int lever = 1;
+    [SerializeField] private String imageName;
+
     public GameObject loadingScreen;
     private Sprite screenshot;
     private string path = "";
@@ -100,7 +104,7 @@ public class PaintScene : MonoBehaviour {
 
     private void DisplayImage(string path) {
         if (System.IO.File.Exists(path)) {
-            path = Application.persistentDataPath + "/Buda_Flower.jpg"; 
+            path = Application.persistentDataPath + "/"+ imageName + ".jpg"; 
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
@@ -322,21 +326,21 @@ public class PaintScene : MonoBehaviour {
     
 
         for (int px = 0; px < rpixels.Length; px++) {
-            double lowestValue = 1000;
+            double lowestValue = 0;
             int colorIndex = -1;
 
+            //Numer of times to mix
+            //int numColorsToMix = 3;
+            
             //First Color Detection
             for (int x = 0; x < 10; x++) {
-                if(lowestValue > HSVDistanceCompare(palette[x], rpixels[px]) || colorIndex == -1) {
-                    lowestValue = HSVDistanceCompare(palette[x], rpixels[px]);
+                if(lowestValue > HSVDistanceCompare(palette[x], rpixels[px], lever) || colorIndex == -1) {
+                    lowestValue = HSVDistanceCompare(palette[x], rpixels[px], lever);
                     colorIndex = x;
                 }
             }
             
             mixed = palette[colorIndex];
-
-            //Numer of times to mix
-            int numColorsToMix = 2;
 
             //Color Mixing
             for (int m = 0; m < numColorsToMix - 1; m++)
@@ -347,9 +351,9 @@ public class PaintScene : MonoBehaviour {
                     {
                         Color a = mixed,
                               b = palette[x];
-                        if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px]))
+                        if (lowestValue > HSVDistanceCompare((a + b) / 2, rpixels[px], lever))
                         {
-                            lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px]);
+                            lowestValue = HSVDistanceCompare((a + b) / 2, rpixels[px], lever);
                             colorIndex = x;
                         }
                     }
@@ -357,8 +361,10 @@ public class PaintScene : MonoBehaviour {
                 mixed = (mixed + palette[colorIndex]) / 2;
             }
 
+            Color32 cpixel;
             rpixels[px] = mixed;
-            Color32 cpixel = mixed;
+            cpixel = mixed;
+            
             if (!color_palette.Contains(cpixel)) {
                 color_palette.Add(cpixel);
             }
@@ -659,19 +665,20 @@ public class PaintScene : MonoBehaviour {
         return palettes;
     }
 
-    public static double HSVDistanceCompare(Color e1, Color e2) {
-        float H1, S1, V1, H2, S2, V2;
-        Color.RGBToHSV(e1, out H1, out S1, out V1);
-        Color.RGBToHSV(e2, out H2, out S2, out V2);
-        Vector3 x = new Vector3(H1, S1, V1);
-        Vector3 y = new Vector3(H2, S2, V2);
-        /*
-        LABColor lab1 = LABColor.FromColor(e1);
-        LABColor lab2 = LABColor.FromColor(e2);
+    public static double HSVDistanceCompare(Color e1, Color e2, int lever) {
+        if(lever == 1) {
+            float H1, S1, V1, H2, S2, V2;
+            Color.RGBToHSV(e1, out H1, out S1, out V1);
+            Color.RGBToHSV(e2, out H2, out S2, out V2);
+            Vector3 x = new Vector3(H1, S1, V1);
+            Vector3 y = new Vector3(H2, S2, V2);
+            return Vector3.Distance(x, y);
+        }  else {
+            LABColor lab1 = LABColor.FromColor(e1);
+            LABColor lab2 = LABColor.FromColor(e2);
 
-        return LABColor.Distance(lab1, lab2);
-        //*/
-        return Vector3.Distance(x, y);
+            return LABColor.Distance(lab1, lab2);
+        }
     }
 
     public static double ColourDistanceGreyScale(Color e1, Color e2) {
