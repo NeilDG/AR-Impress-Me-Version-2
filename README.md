@@ -15,5 +15,5 @@ Setup Tutorial
 
 Manual
 -----
-
+[User Manual.pdf](User_s_Manual.pdf)
 
