@@ -8,8 +8,9 @@ Setup Tutorial
 -----
 
 1. Install Unity, along with the Android Build Support and Vuforia Augmented Reality Support Modules.
-2. Download "Impress Me!" project and open project on Unity.
-3. click the play button to run the application on the editor/and or compile the app as an apk for android devices 
+2. Download [OpenCVForUnity](https://assetstore.unity.com/packages/tools/integration/opencv-for-unity-21088) and import package
+3. Download "Impress Me!" project and open project on Unity.
+4. click the play button to run the application on the editor/and or compile the app as an apk for android devices 
 
 *Unity version 2018.3.12f1 was used in the application 
 
