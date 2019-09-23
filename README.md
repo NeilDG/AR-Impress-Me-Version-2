@@ -8,6 +8,11 @@ This project uses predefined AR markers to spawn 3D models in a real world scene
 
 ![](images/Output.jpg)
 
+The left image is an example of a scene with a predefined 3D model on it, and the right is the output of the application once it has procceseed said image. Below is an illustration of how the app process is conducted, step by step:
+
+![](images/ThesisIllustration.png)
+
+
 Setup Tutorial
 -----
 
