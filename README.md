@@ -6,7 +6,7 @@ Overview
 
 This project uses predefined AR markers to spawn 3D models in a real world scene. It then uses computer vision to create stroke like patterns on top of the scene, creating a painting like image. Below is an illustration of this:
 
-![](images/Output.JPG)
+![](images/Output.jpg)
 
 Setup Tutorial
 -----
