@@ -74,7 +74,7 @@ public class PaintScene : MonoBehaviour {
 
     private void screenShot() {
         Debug.Log(Application.persistentDataPath);
-        path = Application.persistentDataPath + "/UnalteredScene.png";
+        path = Application.persistentDataPath + "/UnalteredScene.jpg";
         //ScreenCapture.CaptureScreenshot("UnalteredScene.png");
         //ScreenCapture.CaptureScreenshot(path);
         RenderTexture rt = new RenderTexture(Screen.width, Screen.height, 24);
