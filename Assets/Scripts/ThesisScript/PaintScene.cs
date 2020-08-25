@@ -17,6 +17,7 @@ public class PaintScene : MonoBehaviour {
     [SerializeField] private ObjectManipulation objectMan;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject mainMenu;
     [SerializeField] private Image image;
     [SerializeField] private Canvas myCanvas;
 
@@ -28,9 +29,79 @@ public class PaintScene : MonoBehaviour {
     private Sprite screenshot;
     private string path = "";
     List<Color32> color_palette = new List<Color32>();
+    private int checkYear = 0;
+    private int threshold = 100;
+    private int maxBrushLength = 16;
+    private int minBrushLength = 4;
+    private float curveFilter = 1f;
+    private int lengthS = 0;
+
 
     //opencv
     private WebCamTextureToMatHelper webCamTextureToMatHelper;
+
+    class strokePoint
+    {
+        public int x;
+        public int y;
+
+        public strokePoint next;
+    }
+
+    class Stroke
+    {
+        public strokePoint p;
+        public strokePoint p_end;
+        public int r;
+        public double colorB;
+        public double colorG;
+        public double colorR;
+        public Stroke next;
+        public Stroke head;
+        public Stroke last;
+        public int length;
+
+        public Stroke(int x, int y, int r, double colorB, double colorG, double colorR)
+        {
+            this.p = new strokePoint();
+            this.p.x = x;
+            this.p.y = y;
+            this.p.next = null; //this leads to not nullable
+            this.p_end = this.p;
+            this.r = r;
+            this.colorB = colorB;
+            this.colorG = colorG;
+            this.colorR = colorR;
+            this.next = null;
+        }
+
+        public void shuffleStrokes(System.Random random)
+        {
+            if (length < 2) return;
+            if (random == null) random = new System.Random();
+            var result = new Stroke[length];
+            int i = 0;
+            for (var node = head; node != null; node = node.next)
+            {
+                int j = random.Next(i + 1);
+                if (i != j)
+                    result[i] = result[j];
+                result[j] = node;
+                i++;
+
+            }
+
+            head = last = result[0];
+            for (i = 1; i < result.Length; i++)
+            {
+                last = last.next = result[i];
+            }
+            last.next = null;
+        }
+
+    }
+
+    Stroke S = null;
 
     // Use this for initialization
     void Start () {
@@ -98,6 +169,7 @@ public class PaintScene : MonoBehaviour {
         DisplayImage(path);
         image.enabled = true;
         paintButton.SetActive(false);
+        mainMenu.SetActive(false);
         backButton.SetActive(true);
         myCanvas.enabled = true;
     }
@@ -147,13 +219,22 @@ public class PaintScene : MonoBehaviour {
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
             Utils.texture2DToMat(texture, TextureMat);
-            
+            Mat refImg = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            Mat Canvas = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            int[] radius = new int[] { 8, 4, 2 };
+
+            for (int i = 0; i < 3; i++)
+            {
+                int kernelSize = radius[i] + 1;
+                Imgproc.GaussianBlur(TextureMat, refImg, new Size(kernelSize, kernelSize), 0, 0);
+                paintLayer(Canvas, refImg, radius[i]);
+            }
             //Get KMEANS
             //Mat label = new Mat(texture.height, texture.width, CvType.CV_8UC1);
             //TermCriteria tc = new TermCriteria(TermCriteria.EPS, 10, 1);
             //Core.kmeans(TextureMat, 20, label, tc, 10, Core.KMEANS_PP_CENTERS);
 
-            Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+            /*Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
             Mat gradientx = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
             Mat gradienty = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
             
@@ -282,15 +363,188 @@ public class PaintScene : MonoBehaviour {
             Debug.Log("Longest : " + longest);
             Debug.Log("Shortest : " + shortest);
             Debug.Log("Angle : " + angleShort);
-            Utils.matToTexture2D(rgbaMat, texture);
-            
-            //OPENCV
-            
+            Utils.matToTexture2D(rgbaMat, texture);*/
+
+            Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
+            Utils.matToTexture2D(Canvas, texture);
+            Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
+
+            texture.Apply();
+
             Sprite sprite = Sprite.Create(texture, new UnityEngine.Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
             image.sprite = sprite;
             screenshot = sprite;
             arcamera.SetActive(false);
         }
+    }
+
+    private void paintLayer(Mat canvas, Mat refImg, int r)
+    {
+        Imgproc.cvtColor(refImg, refImg, Imgproc.COLOR_BGRA2RGB);
+        Imgproc.cvtColor(canvas, canvas, Imgproc.COLOR_RGBA2RGB);
+        float[,] diffs = new float[canvas.rows(), canvas.cols()];
+        int grid = r;
+
+        for (int i = 0; i < refImg.cols(); i++)
+        {
+            for (int j = 0; j < refImg.rows(); j++)
+            {
+                diffs[j, i] = diff(canvas.get(j, i), refImg.get(j, i));
+            }
+        }
+
+        for (int i = 0; i < canvas.cols(); i += grid)
+        {
+            for (int j = 0; j < canvas.rows(); j += grid)
+            {
+                float areaError = 0;
+                for (int x = i; x <= i + grid; x++)
+                {
+                    for (int y = j; y <= j + grid; y++)
+                    {
+                        if (x >= 0 && y >= 0 && i >= 0 && j >= 0 && i < canvas.cols() && j < canvas.rows() && x < canvas.cols() && y < canvas.rows())
+                        {
+                            areaError += diffs[y, x] / (float)Math.Pow(grid, 2);
+                        }
+                    }
+                }
+                if (areaError > threshold)
+                {
+                    Stroke s = generateSplineStrokes(r, i, j, refImg, canvas);
+                    if (s.last != null)
+                        s.last.next = S;
+                    else
+                        s.head = s;
+
+                    s.last = S;
+                    s.next = S;
+                    S = s;
+                    lengthS += 1;
+                }
+            }
+        }
+
+        Debug.Log(lengthS);
+        S.length = lengthS;
+        int ctr = 0;
+        var random = new System.Random();
+        S.shuffleStrokes(random);
+        S = S.head;
+        Stroke cur = S;
+        while (cur != null)
+        {
+            Imgproc.line(canvas, new Point(cur.p.x, cur.p.y), new Point(cur.p_end.x, cur.p_end.y), new Scalar(cur.colorR, cur.colorG, cur.colorB), 2 * r);
+            cur = cur.next;
+        }
+
+        Array.Clear(diffs, 0, diffs.Length);
+        Stroke pre;
+        System.Random rnd = new System.Random();
+        Imgproc.cvtColor(canvas, canvas, Imgproc.COLOR_RGB2RGBA);
+    }
+    private float diff(double[] a, double[] b)
+    {
+        double d = Math.Sqrt(Math.Pow(a[0] - b[0], 2)
+                        + Math.Pow(a[1] - b[1], 2)
+                        + Math.Pow(a[2] - b[2], 2));
+
+        return (float)d;
+    }
+
+    private Stroke generateSplineStrokes(int radius, int x0, int y0, Mat refImg, Mat canvas)
+    {
+        double colorR = refImg.get(y0, x0)[0];
+        double colorG = refImg.get(y0, x0)[1];
+        double colorB = refImg.get(y0, x0)[2];
+        //Imgcodecs.imwrite(Application.persistentDataPath + "/haysss.jpg", refImg);
+        //Debug.Log("x: " + x0 + " y:" + y0 + " "+ colorR + " " + colorG + " " + colorR);
+        Stroke K = new Stroke(x0, y0, radius, colorB, colorG, colorR);
+
+        //Imgcodecs.imwrite("D:/Thesis/ImageOutputs" + "/reeeee" + x0 + ".jpg", refImg);
+
+        /*Imgcodecs.imwrite(Application.persistentDataPath + "/reeeee.jpg", refImg);
+        Imgcodecs.imwrite(Application.persistentDataPath + "/reeeee2.jpg", canvas);*/
+
+        Mat dst = new Mat(canvas.rows(), canvas.cols(), CvType.CV_8UC1);
+        Mat grad_x = new Mat(canvas.rows(), canvas.cols(), CvType.CV_8UC1);
+        Mat grad_y = new Mat(canvas.rows(), canvas.cols(), CvType.CV_8UC1);
+
+        Mat rgb_grad_x = new Mat(canvas.rows(), canvas.cols(), CvType.CV_8UC4);
+        Mat rgb_grad_y = new Mat(canvas.rows(), canvas.cols(), CvType.CV_8UC4);
+        //Mat abs_grad_x = new Mat();
+        //Mat abs_grad_y = new Mat(); 
+
+        int x = x0;
+        int y = y0;
+
+        float last_dx = 0;
+        float last_dy = 0;
+
+
+        Imgproc.cvtColor(refImg, dst, Imgproc.COLOR_RGBA2GRAY);
+
+        Imgproc.Sobel(dst, grad_x, CvType.CV_8UC1, 1, 0, 3, 1, 0, Core.BORDER_DEFAULT);
+        // For Showing Edges
+        //Core.convertScaleAbs(grad_x, abs_grad_x);
+
+        Imgproc.Sobel(dst, grad_y, CvType.CV_8UC1, 0, 1, 3, 1, 0, Core.BORDER_DEFAULT);
+
+        Imgproc.cvtColor(grad_x, rgb_grad_x, Imgproc.COLOR_GRAY2BGRA);
+        Imgproc.cvtColor(grad_y, rgb_grad_y, Imgproc.COLOR_GRAY2BGRA);
+
+        // For Showing Edges
+        //Core.convertScaleAbs(grad_y, abs_grad_y);
+
+        //For Showing Edges
+        //Core.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, refImg);
+
+        for (int i = 0; i < maxBrushLength; i++)
+        {
+            if (i > minBrushLength && diff(refImg.get(y, x), canvas.get(y, x)) < diff(refImg.get(y, x), refImg.get(y0, x0)))
+            {
+                return K;
+            }
+
+            if (rgb_grad_x.get(y, x)[0] == 0 && rgb_grad_x.get(y, x)[1] == 0 && rgb_grad_x.get(y, x)[2] == 0 &&
+                rgb_grad_y.get(y, x)[0] == 0 && rgb_grad_y.get(y, x)[1] == 0 && rgb_grad_y.get(y, x)[2] == 0)
+            {
+                return K;
+            }
+
+            //sobelx.at<Vec3b>(y,x)[0]==0 && sobelx.at<Vec3b>(y,x)[1]==0 && sobelx.at<Vec3b>(y,x)[2]==0 && sobely.at<Vec3b>(y,x)[0]==0 && sobely.at<Vec3b>(y,x)[1]==0 && sobely.at<Vec3b>(y,x)[2]==0
+            float gx = ((float)rgb_grad_x.get(y, x)[0] + (float)rgb_grad_x.get(y, x)[1] + (float)rgb_grad_x.get(y, x)[2]) / 3;
+            float gy = ((float)rgb_grad_y.get(y, x)[0] + (float)rgb_grad_y.get(y, x)[1] + (float)rgb_grad_y.get(y, x)[2]) / 3;
+            float dx = -gy;
+            float dy = gx;
+            if (last_dx * dx + last_dy * dy < 0)
+            {
+                dx = -dx;
+                dy = -dy;
+            }
+
+            dx = curveFilter * dx + (1 - curveFilter) * last_dx;
+            dy = curveFilter * dy + (1 - curveFilter) * last_dy;
+            float dxdyLength = (float)Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+
+            dx = dx / dxdyLength;
+            dy = dy / dxdyLength;
+
+            x = x + radius * (int)dx;
+            y = y + radius * (int)dy;
+
+            if (x < 0 || y < 0 || x >= canvas.cols() || y >= canvas.rows())
+                break;
+            else
+            {
+                strokePoint p_temp = new strokePoint();
+                p_temp.x = x;
+                p_temp.y = y;
+                p_temp.next = null;
+                K.p_end.next = p_temp;
+                K.p_end = K.p_end.next;
+            }
+        }
+        return K;
     }
 
     public void back() {
@@ -300,6 +554,7 @@ public class PaintScene : MonoBehaviour {
         image.enabled = false;
         backButton.SetActive(false);
         paintButton.SetActive(true);
+        mainMenu.SetActive(true);
         objectMan.reset();
         arcamera.SetActive(true);
     }
