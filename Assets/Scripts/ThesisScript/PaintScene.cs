@@ -228,146 +228,164 @@ public class PaintScene : MonoBehaviour {
                 int kernelSize = radius[i] + 1;
                 Imgproc.GaussianBlur(TextureMat, refImg, new Size(kernelSize, kernelSize), 0, 0);
                 paintLayer(Canvas, refImg, radius[i]);
+                Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName + "_" + i + ".jpg", Canvas);
+
             }
-            //Get KMEANS
-            //Mat label = new Mat(texture.height, texture.width, CvType.CV_8UC1);
-            //TermCriteria tc = new TermCriteria(TermCriteria.EPS, 10, 1);
-            //Core.kmeans(TextureMat, 20, label, tc, 10, Core.KMEANS_PP_CENTERS);
+            /*
+                        Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+                        Mat gradientx = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
+                        Mat gradienty = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
 
-            /*Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
-            Mat gradientx = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
-            Mat gradienty = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
-            
-            Mat rgbaMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
-            Utils.texture2DToMat(texture, rgbaMat);
-            
-            Imgproc.cvtColor(rgbaMat, grayMat, Imgproc.COLOR_RGBA2GRAY);
-            Imgproc.Scharr(grayMat, gradientx, rgbaMat.depth(), 1, 0, 1 / 15.36);
-            Imgproc.Scharr(grayMat, gradienty, rgbaMat.depth(), 0, 1, 1 / 15.36);
+                        Mat rgbaMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+                        Utils.texture2DToMat(texture, rgbaMat);
 
-            //int gradient_smoothing_radius = Math.Round(Math.Max(rgbaMat.dims) / 50);
-            //chosen stroke scale: 2
-            //chosen gradient smoothing radius: 16
-            Imgproc.GaussianBlur(gradientx, gradientx, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
-            Imgproc.GaussianBlur(gradienty, gradienty, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
+                        Imgproc.cvtColor(rgbaMat, grayMat, Imgproc.COLOR_RGBA2GRAY);
+                        Imgproc.Scharr(grayMat, gradientx, rgbaMat.depth(), 1, 0, 1 / 15.36);
+                        Imgproc.Scharr(grayMat, gradienty, rgbaMat.depth(), 0, 1, 1 / 15.36);
 
-            Imgproc.medianBlur(rgbaMat, rgbaMat, 11);
+                        //int gradient_smoothing_radius = Math.Round(Math.Max(rgbaMat.dims) / 50);
+                        //chosen stroke scale: 2
+                        //chosen gradient smoothing radius: 16
+                        Imgproc.GaussianBlur(gradientx, gradientx, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
+                        Imgproc.GaussianBlur(gradienty, gradienty, new Size(2 * 16 + 1, 2 * 16 + 1), 0);
 
-            List<int> gridx = new List<int>();
-            List<int> gridy = new List<int>();
-            int index = 0;
-            System.Random rnd = new System.Random();
+                        Imgproc.medianBlur(rgbaMat, rgbaMat, 11);
 
-            //new grid
-            for (int i = 0; i < texture.width; i+=3) {
-                for (int j = 0; j < texture.height; j+=3) {
-                    int x = rnd.Next(-1, 2) + i;
-                    int y = rnd.Next(-1, 2) + j;
+                        List<int> gridx = new List<int>();
+                        List<int> gridy = new List<int>();
+                        int index = 0;
+                        System.Random rnd = new System.Random();
 
-                    gridy.Add(y % texture.height);
-                    gridx.Add(x % texture.width);
-                    index++;
-                }
-            }
-            //shuffle grid
-            int n = gridy.Count;
-            while (n > 1) {
-                n--;
-                int k = rnd.Next(n + 1);
-                int temp = gridy[k];
-                gridy[k] = gridy[n];
-                gridy[n] = temp;
+                        //new grid
+                        for (int i = 0; i < texture.width; i += 3)
+                        {
+                            for (int j = 0; j < texture.height; j += 3)
+                            {
+                                int x = rnd.Next(-1, 2) + i;
+                                int y = rnd.Next(-1, 2) + j;
 
-                temp = gridx[k];
-                gridx[k] = gridx[n];
-                gridx[n] = temp;
-            }
+                                gridy.Add(y % texture.height);
+                                gridx.Add(x % texture.width);
+                                index++;
+                            }
+                        }
+                        //shuffle grid
+                        int n = gridy.Count;
+                        while (n > 1)
+                        {
+                            n--;
+                            int k = rnd.Next(n + 1);
+                            int temp = gridy[k];
+                            gridy[k] = gridy[n];
+                            gridy[n] = temp;
 
-            int batch_size = 10000;
-            Debug.Log(gridx.Count + " " + gridy.Count);
-            List<Color32> pixels = new List<Color32>();
-            List<Color32> orgPixels = new List<Color32>();
-            double shortest = 50, longest = 0, angleShort = 0;
-            for (int h = 0; h < index - 1; h += batch_size) {
-                pixels = new List<Color32>();
-                orgPixels = new List<Color32>();
-                int endpoint = h + batch_size;
-                if (endpoint > index - 1)
-                    endpoint = index - 1;
-                //get the color from the texture
-                for (int px = h; px < endpoint; px++) {
-                    Color32 cpixel = texture.GetPixel(gridx[px], (gridy[px] - (texture.height - 1)) * (-1));
-                    pixels.Add(cpixel);
-                    cpixel = orgTexture.GetPixel(gridx[px], (gridy[px] - (orgTexture.height - 1)) * (-1));
-                    orgPixels.Add(cpixel);
-                }
-                int cindex = 0;
-                for (int px = h; px < endpoint; px++) {
-                    int x = gridx[px],
-                        y = gridy[px];
+                            temp = gridx[k];
+                            gridx[k] = gridx[n];
+                            gridx[n] = temp;
+                        }
 
-                    //get color
-                    Color32 cpixel;
-                    //use color of pixel
-                    int cprob = rnd.Next(1, 11);
+                        int batch_size = 10000;
+                        Debug.Log(gridx.Count + " " + gridy.Count);
+                        List<Color32> pixels = new List<Color32>();
+                        List<Color32> orgPixels = new List<Color32>();
+                        double shortest = 50, longest = 0, angleShort = 0;
+                        for (int h = 0; h < index - 1; h += batch_size)
+                        {
+                            pixels = new List<Color32>();
+                            orgPixels = new List<Color32>();
+                            int endpoint = h + batch_size;
+                            if (endpoint > index - 1)
+                                endpoint = index - 1;
+                            //get the color from the texture
+                            for (int px = h; px < endpoint; px++)
+                            {
+                                Color32 cpixel = texture.GetPixel(gridx[px], (gridy[px] - (texture.height - 1)) * (-1));
+                                pixels.Add(cpixel);
+                                cpixel = orgTexture.GetPixel(gridx[px], (gridy[px] - (orgTexture.height - 1)) * (-1));
+                                orgPixels.Add(cpixel);
+                            }
+                            int cindex = 0;
+                            for (int px = h; px < endpoint; px++)
+                            {
+                                int x = gridx[px],
+                                    y = gridy[px];
 
-                    //if(cprob <= 10) {
-                    Color a, b;
-                    a = orgPixels[cindex];
-                    b = pixels[cindex];
-                    //here lol
-                    cpixel = (a+b)/2;
-                    //cpixel = a;
-                    //} else {
-                    //if (cprob > 5) {
-                    List<Color32> c_palette = color_palette;
-                    c_palette.Remove(pixels[cindex]);
-                    cprob = 0;
-                    cprob = rnd.Next(0, c_palette.Count-1);
-                    a = c_palette[cprob];
-                    b = cpixel;
-                    //cpixel = (a  + b )/2;
-                    //cpixel = b*1.1f;
-                        
-                    
-                    //cpixel = a;
+                                //get color
+                                Color32 cpixel;
+                                //use color of pixel
+                                int cprob = rnd.Next(1, 11);
 
-                    //}
-                    cindex++;
-                    //get angle
-                    double length = Math.Round(2+2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
-                    double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
-                    double lengthb = 1;
-                    if (length < shortest) {
-                        shortest = length;
-                        angleShort = angle;
-                    }
-                    if(length > longest)
-                        longest = length;
-                    if (length > 2 && angle != 90) {
-                        length /= 3;
-                    } else {
-                        angle += 80;
-                        length = 10;
-                        lengthb = 2;
-                        float H, S, V;
-                        Color.RGBToHSV(b, out H, out S, out V);
-                        float sat = cprob * 0.01f;
-                        sat += 1;
-                        S *= sat;
-                        cpixel = Color.HSVToRGB(H, S, V);
-                    }
-                    Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, lengthb), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
-                }
-            }
-            Debug.Log("Longest : " + longest);
-            Debug.Log("Shortest : " + shortest);
-            Debug.Log("Angle : " + angleShort);
-            Utils.matToTexture2D(rgbaMat, texture);*/
+                                //if(cprob <= 10) {
+                                Color a, b;
+                                a = orgPixels[cindex];
+                                b = pixels[cindex];
+                                //here lol
+                                cpixel = (a + b) / 2;
+                                //cpixel = a;
+                                //} else {
+                                //if (cprob > 5) {
+                                List<Color32> c_palette = color_palette;
+                                c_palette.Remove(pixels[cindex]);
+                                cprob = 0;
+                                cprob = rnd.Next(0, c_palette.Count - 1);
+                                a = c_palette[cprob];
+                                b = cpixel;
+                                //cpixel = (a  + b )/2;
+                                //cpixel = b*1.1f;
+
+
+                                //cpixel = a;
+
+                                //}
+                                cindex++;
+                                //get angle
+                                double length = Math.Round(2 + 2 * Math.Sqrt(Math.Sqrt(gradienty.get(y, x)[0] * gradienty.get(y, x)[0] + gradientx.get(y, x)[0] * gradientx.get(y, x)[0])));
+                                double angle = (180 / Math.PI) * (Math.Atan2(gradienty.get(y, x)[0], gradientx.get(y, x)[0])) + 90;
+                                double lengthb = 1;
+                                if (length < shortest)
+                                {
+                                    shortest = length;
+                                    angleShort = angle;
+                                }
+                                if (length > longest)
+                                    longest = length;
+                                if (length > 2 && angle != 90)
+                                {
+                                    length /= 3;
+                                }
+                                else
+                                {
+                                    angle += 80;
+                                    length = 10;
+                                    lengthb = 2;
+                                    float H, S, V;
+                                    Color.RGBToHSV(b, out H, out S, out V);
+                                    float sat = cprob * 0.01f;
+                                    sat += 1;
+                                    S *= sat;
+                                    cpixel = Color.HSVToRGB(H, S, V);
+                                }
+                                Imgproc.ellipse(rgbaMat, new Point(x, y), new Size(length, lengthb), angle, 0, 360, new Scalar(cpixel.r, cpixel.g, cpixel.b), -1, Imgproc.LINE_AA);
+                            }
+                            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\PredecessorBrushStroke" + h + ".jpg", rgbaMat);
+                        }
+                        Debug.Log("Longest : " + longest);
+                        Debug.Log("Shortest : " + shortest);
+                        Debug.Log("Angle : " + angleShort);
+                        Utils.matToTexture2D(rgbaMat, texture);
+            */
 
             Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
             Utils.matToTexture2D(Canvas, texture);
+
+            //texture = changeColor(texture, centers);
+
             Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
+            Utils.texture2DToMat(texture, Canvas);
+            Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
+
+            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_Final.jpg", Canvas);
+            //Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_ColorChanged.jpg", Canvas);
 
             texture.Apply();
 
