@@ -16,14 +16,14 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:12345")
 style = Impressionist()
-painter = Painter(style=style, output_dir='test-images/')
+painter = Painter(style=style, output_dir='D:/Thesis/Outputs/')
 while True:
 	received = socket.recv()
 	print(received)
 	im = Image.open(BytesIO(base64.b64decode(received)))
 	res = painter.paint(im)
-	res.write_to_png('test-images/finaloutput3.png')
-	with open('test-images/finaloutput2.png', "rb") as img_file:
+	res.write_to_png('D:\\Thesis\\Outputs\\finaloutput3.png')
+	with open('D:\\Thesis\\Outputs\\finaloutput3.png', "rb") as img_file:
 		message = base64.b64encode(img_file.read())
 	print(message)
 	socket.send(message)

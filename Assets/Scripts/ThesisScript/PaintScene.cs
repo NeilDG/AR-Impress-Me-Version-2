@@ -36,6 +36,8 @@ public class PaintScene : MonoBehaviour {
     private float curveFilter = 1f;
     private int lengthS = 0;
 
+    private ClientSocketScript clientSocket;
+
 
     //opencv
     private WebCamTextureToMatHelper webCamTextureToMatHelper;
@@ -223,14 +225,32 @@ public class PaintScene : MonoBehaviour {
             Mat Canvas = new Mat(texture.height, texture.width, CvType.CV_8UC4);
             int[] radius = new int[] { 8, 4, 2 };
 
-            for (int i = 0; i < 3; i++)
+
+            // ZMQ BRUSH STROKE ALGORITHM
+            byte[] colorChangedPic = texture.EncodeToJPG();
+            string image64 = Convert.ToBase64String(colorChangedPic);
+
+            clientSocket = new ClientSocketScript(image64);
+            clientSocket.Start();
+            while(clientSocket.getPicture() == null)
+            {
+                clientSocket.Update();
+            }
+
+            bytes = Convert.FromBase64String(clientSocket.getPicture());
+            clientSocket.Stop();
+
+            texture.LoadImage(bytes);
+
+            // OLD BRUSH STROKE ALGORITHM
+            /*for (int i = 0; i < 3; i++)
             {
                 int kernelSize = radius[i] + 1;
                 Imgproc.GaussianBlur(TextureMat, refImg, new Size(kernelSize, kernelSize), 0, 0);
                 paintLayer(Canvas, refImg, radius[i]);
                 Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName + "_" + i + ".jpg", Canvas);
 
-            }
+            }*/
             /*
                         Mat grayMat = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
                         Mat gradientx = new Mat(TextureMat.rows(), TextureMat.cols(), CvType.CV_8UC1);
@@ -376,7 +396,7 @@ public class PaintScene : MonoBehaviour {
             */
 
             Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
-            Utils.matToTexture2D(Canvas, texture);
+            //Utils.matToTexture2D(Canvas, texture);
 
             //texture = changeColor(texture, centers);
 
