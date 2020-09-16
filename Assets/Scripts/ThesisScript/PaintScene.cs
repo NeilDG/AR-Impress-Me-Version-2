@@ -187,13 +187,13 @@ public class PaintScene : MonoBehaviour {
 
             if (Screen.orientation == ScreenOrientation.Portrait) {
                 int height = texture.height / (texture.width / 480);
-                texture = ScaleTexture(texture, 480, height);
-                orgTexture = ScaleTexture(orgTexture, 480, height);
+                texture = ScaleTexture(texture, 720, 480);
+                orgTexture = ScaleTexture(orgTexture, 720, 480);
             }
             else {
                 int width = texture.width / (texture.height / 480);
-                texture = ScaleTexture(texture, width, 480);
-                orgTexture = ScaleTexture(orgTexture, width, 480);
+                texture = ScaleTexture(texture, 720, 480);
+                orgTexture = ScaleTexture(orgTexture, 720, 480);
             }
             //OPENCV Color Picker
             Mat OrgTextureMat = new Mat(orgTexture.height, orgTexture.width, CvType.CV_8UC4);
@@ -395,7 +395,7 @@ public class PaintScene : MonoBehaviour {
                         Utils.matToTexture2D(rgbaMat, texture);
             */
 
-            Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
+            //Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
             //Utils.matToTexture2D(Canvas, texture);
 
             //texture = changeColor(texture, centers);
@@ -404,7 +404,7 @@ public class PaintScene : MonoBehaviour {
             Utils.texture2DToMat(texture, Canvas);
             Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
 
-            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_Final.jpg", Canvas);
+            //Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_Final.jpg", Canvas);
             //Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_ColorChanged.jpg", Canvas);
 
             texture.Apply();

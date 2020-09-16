@@ -25,8 +25,8 @@ class Painter:
         for i, radius in enumerate(self.style.brush_sizes):
             ref_img = src_img.filter(ImageFilter.GaussianBlur(radius=self.style.blur_filter*radius))
             self.paintLayer(ref_img, radius)
-            self.canvas.write_to_png(
-                os.path.join(self.output_dir, '%s_%s_%d.png' % (self.style.__class__.__name__, "output", i)))
+            #self.canvas.write_to_png(
+            #   os.path.join(self.output_dir, '%s_%s_%d.png' % (self.style.__class__.__name__, "output", i)))
         return self.canvas
 
     def paintLayer(self, ref_img, radius):

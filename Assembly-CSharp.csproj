@@ -418,6 +418,7 @@
     <None Include="Assets\Shader\OilPainting.shader" />
     <None Include="Assets\OpenCVForUnity\Plugins\macOS\opencvforunity.bundle\Contents\Resources\gl3w\readme.txt" />
     <None Include="Assets\Vuforia\Shaders\OutlineOpaque.shader" />
+    <None Include="Assets\Shader\learn.shader" />
     <None Include="Assets\StreamingAssets\Vuforia\ARTemp.xml" />
     <None Include="Assets\StreamingAssets\text\trained_classifier_erGrouping.xml" />
     <None Include="Assets\Vuforia\Shaders\DepthMask.shader" />
