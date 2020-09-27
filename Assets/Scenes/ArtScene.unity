@@ -6357,7 +6357,7 @@ MonoBehaviour:
   myCanvas: {fileID: 223762454002940833}
   numColorsToMix: 3
   lever: 2
-  imageName: 18
+  imageName: IMG_1147
   loadingScreen: {fileID: 390755258}
 --- !u!4 &1675197355
 Transform:
