@@ -11,11 +11,10 @@ using NetMQ.Sockets;
 public class ClientSocketScript
 {
     private NetMqListener _netMqListener;
-    private string picture;
     private string response;
     private void HandleMessage(string message)
     {
-        this.picture = message;
+        setResponse(message);
     }
 
     public ClientSocketScript(string pic64, string message)
@@ -41,16 +40,6 @@ public class ClientSocketScript
     public void Stop()
     {
         _netMqListener.Stop();
-    }
-    
-    public string getPicture()
-    {
-        return picture;
-    }
-
-    public void setPicture(string picture)
-    {
-        this.picture = picture; 
     }
 
     public string getResponse()

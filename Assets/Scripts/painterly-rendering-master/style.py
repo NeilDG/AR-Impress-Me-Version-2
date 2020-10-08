@@ -12,7 +12,7 @@ class Style:
 class Impressionist(Style):
     def __init__(self):
         super().__init__()
-        self.threshold = 2
+        self.threshold = 10
         self.brush_sizes = [8, 4, 2]
         self.curvature_filter = 1.
         self.blur_filter = .5

@@ -385,6 +385,7 @@
     <Compile Include="Assets\Scripts\ThesisScript\LoadingScreenController.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\ObjectManipulation.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\PaintScene.cs" />
+    <Compile Include="Assets\Scripts\ThesisScript\PastCode.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\ResultScene.cs" />
     <Compile Include="Assets\Scripts\ThesisScript\ServerSocketScript.cs" />
     <Compile Include="Assets\Scripts\UI Optimization\HidingScrollView.cs" />
