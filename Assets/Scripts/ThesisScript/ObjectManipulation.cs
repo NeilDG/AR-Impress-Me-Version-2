@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.IO;
@@ -35,6 +34,10 @@ public class ObjectManipulation : MonoBehaviour
     private GameObject cGameObject;
 
     [SerializeField] GameObject buttonPrefab;
+    [SerializeField] GameObject brushStrokeButton;
+    [SerializeField] GameObject brushStrokeScrollView;
+    [SerializeField] GameObject extraOptionsButton;
+    [SerializeField] GameObject extraOptionsScrollView;
 
     // Start is called before the first frame update
     void Start()
@@ -81,7 +84,7 @@ public class ObjectManipulation : MonoBehaviour
             var ray = arcamera.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit)) {
-                if (!hit.transform.name.Equals(current) && !scrollView.active) {
+                if (!hit.transform.name.Equals(current) && !scrollView.active && !extraOptionsScrollView.active && !brushStrokeScrollView.active) {
                     reset();
                     cGameTransform = hit.transform;
                     current = hit.transform.name;
@@ -99,7 +102,7 @@ public class ObjectManipulation : MonoBehaviour
                     zArrow.transform.localPosition = cGameTransform.localPosition;
                 }
             } else {
-                if(!scrollView.active && !backButton.active) 
+                if(!scrollView.active && !backButton.active && !extraOptionsScrollView.active && !brushStrokeScrollView.active) 
                     reset();
             }
         }
@@ -129,14 +132,15 @@ public class ObjectManipulation : MonoBehaviour
         paintButton.SetActive(false);
         backButton.SetActive(true);
         scrollView.SetActive(true);
-        
+        brushStrokeButton.SetActive(false);
+        extraOptionsButton.SetActive(false);
+        ModelMenu.GetComponent<CanvasGroup>().alpha = 0;
     }
 
     public void RemoveModel() {
         Debug.Log("in");
         for (int x = 0; x < models.Length; x++) {
             if (cGameTransform.name.Contains(models[x].name)) {
-                //Debug.Log(cGameTransform.name);
                 models[x].SetActive(false);
             }
         }
@@ -146,6 +150,9 @@ public class ObjectManipulation : MonoBehaviour
     public void reset() {
         current = "";
         scrollView.SetActive(false);
+        ModelMenu.GetComponent<CanvasGroup>().alpha = 1;
+        brushStrokeButton.SetActive(true);
+        extraOptionsButton.SetActive(true);
 
         xArrow.SetActive(false);
         yArrow.SetActive(false);

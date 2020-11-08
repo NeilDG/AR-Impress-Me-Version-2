@@ -18,17 +18,21 @@ public class PaintScene : MonoBehaviour
     [SerializeField] private GameObject arcamera;
     [SerializeField] private Camera camera;
     [SerializeField] private ObjectManipulation objectMan;
+    [SerializeField] private ResultManipulation resultMan;
     [SerializeField] private GameObject paintButton;
     [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject optionButton;
     [SerializeField] private GameObject mainMenu;
-    [SerializeField] private Image image;
+    [SerializeField] private GameObject selectBrushStrokeButton;
+    [SerializeField] private GameObject extraOptionsButton;
+    [SerializeField] private Image[] images;
     [SerializeField] private Canvas myCanvas;
+    [SerializeField] private GameObject loadingScreen;
 
     [SerializeField] private int numColorsToMix = 2;
     [SerializeField] private int lever = 1;
     [SerializeField] private String imageName;
 
-    public GameObject loadingScreen;
     private Sprite screenshot;
     private string path = "";
     private string path1 = "";
@@ -39,10 +43,14 @@ public class PaintScene : MonoBehaviour
     private int minBrushLength = 4;
     private float curveFilter = 1f;
     private int lengthS = 0;
-    private int color_palette_index = 0;
+
+    private Mat centers;
+    private Texture2D unalteredScene;
+    private Texture2D pre1886ColorChangedTexture;
+    private Texture2D post1886ColorChangedTexture;
+    private Texture2D finalYearsColorChangedTexture;
 
     private ClientSocketScript clientSocket;
-
 
     //opencv
     private WebCamTextureToMatHelper webCamTextureToMatHelper;
@@ -116,50 +124,62 @@ public class PaintScene : MonoBehaviour
         Debug.Log(path);
 
         string base64Image = Convert.ToBase64String(shot);
-        clientSocket = new ClientSocketScript(base64Image, "GetColorPalette");
+        clientSocket = new ClientSocketScript(base64Image, "GetColorPalette", resultMan.getBrushStrokeIndex(), resultMan.getBrushValues());
         clientSocket.Start();
         while (clientSocket.getResponse() == null)
         {
             clientSocket.Update();
         }
-
-        color_palette_index = Int32.Parse(clientSocket.getResponse());
+        int paletteIndex = Int32.Parse(clientSocket.getResponse());
+        if (resultMan.getSelectedPalette() == -1)
+            resultMan.setSelectedPalette(paletteIndex);
+        resultMan.setChosenDynamicPalette(paletteIndex);
         clientSocket.Stop();
     }
 
     private void showScreenShot()
     {
         DisplayImage(path);
-        image.enabled = true;
         paintButton.SetActive(false);
         mainMenu.SetActive(false);
         backButton.SetActive(true);
+        optionButton.SetActive(true);
+        selectBrushStrokeButton.SetActive(false);
+        extraOptionsButton.SetActive(false);
         myCanvas.enabled = true;
     }
 
     private void DisplayImage(string path)
-    {
+    { 
         if (System.IO.File.Exists(path))
         {
             path = Application.persistentDataPath + "/" + imageName + ".jpg";
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(1, 1);
             texture.LoadImage(bytes);
+            unalteredScene = new Texture2D(1, 1);
+            unalteredScene.LoadImage(bytes);
             Texture2D orgTexture = new Texture2D(1, 1);
             orgTexture.LoadImage(bytes);
+            
+            float aspectRatio = texture.width / texture.height;
+            
 
             if (Screen.orientation == ScreenOrientation.Portrait)
             {
-                int height = texture.height / (texture.width / 480);
-                texture = ScaleTexture(texture, 634, 480);
-                orgTexture = ScaleTexture(orgTexture, 634, 480);
+                int width = (int)Math.Round(480 * aspectRatio);
+                texture = ScaleTexture(texture, width, 480);
+                unalteredScene = ScaleTexture(texture, width, 480);
+                orgTexture = ScaleTexture(orgTexture, width, 480);
             }
             else
             {
-                int width = texture.width / (texture.height / 480);
-                texture = ScaleTexture(texture, 480, 634);
-                orgTexture = ScaleTexture(orgTexture, 480, 634);
+                int height = (int)Math.Round(480 / aspectRatio);
+                texture = ScaleTexture(texture, 480, height);
+                unalteredScene = ScaleTexture(texture, 480, height);
+                orgTexture = ScaleTexture(orgTexture, 480, height);
             }
+
             //OPENCV Color Picker
             Mat OrgTextureMat = new Mat(orgTexture.height, orgTexture.width, CvType.CV_8UC4);
             Utils.texture2DToMat(orgTexture, OrgTextureMat);
@@ -171,7 +191,7 @@ public class PaintScene : MonoBehaviour
 
             Mat labels = new Mat();
             TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
-            Mat centers = new Mat();
+            centers = new Mat();
             Core.kmeans(samples32f, 10, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
 
             //centers.convertTo(centers, CvType.CV_8UC1, 255.0);
@@ -182,21 +202,40 @@ public class PaintScene : MonoBehaviour
             Debug.Log(centers.cols());
 
             texture = changeColor(texture, centers);
-
             //OPENCV
             Mat TextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
-            Utils.texture2DToMat(texture, TextureMat);
-            Mat refImg = new Mat(texture.height, texture.width, CvType.CV_8UC4);
-            Mat Canvas = new Mat(texture.height, texture.width, CvType.CV_8UC4);
-            int[] radius = new int[] { 8, 4, 2 };
+            Mat CopyTextureMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
 
+            Imgproc.cvtColor(CopyTextureMat, CopyTextureMat, Imgproc.COLOR_RGB2BGRA);
+          
+            Utils.texture2DToMat(texture, TextureMat);
+            Utils.texture2DToMat(texture, CopyTextureMat);
+            Imgproc.cvtColor(CopyTextureMat, CopyTextureMat, Imgproc.COLOR_RGB2BGRA);
+            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\ColorChange_" + imageName + ".jpg", CopyTextureMat);
+
+            //Mat refImg = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            Mat Canvas = new Mat(texture.height, texture.width, CvType.CV_8UC4);
+            //int[] radius = new int[] { 8, 4, 2 };
+
+            if(resultMan.getSelectedPalette() == 0)
+            {
+                pre1886ColorChangedTexture = texture;
+            }
+            else if(resultMan.getSelectedPalette() == 1)
+            {
+                post1886ColorChangedTexture = texture;
+            }
+            else if(resultMan.getSelectedPalette() == 2)
+            {
+                finalYearsColorChangedTexture = texture;
+            }
 
             // ZMQ BRUSH STROKE ALGORITHM
             byte[] colorChangedPic = texture.EncodeToJPG();
             string image64 = Convert.ToBase64String(colorChangedPic);
 
             // Copy this structure to add in change color
-            clientSocket = new ClientSocketScript(image64, "GetBrushStrokes");
+            clientSocket = new ClientSocketScript(image64, "GetBrushStrokes", resultMan.getBrushStrokeIndex(), resultMan.getBrushValues());
             clientSocket.Start();
             while (clientSocket.getResponse() == null)
             {
@@ -360,15 +399,62 @@ public class PaintScene : MonoBehaviour
             Utils.texture2DToMat(texture, Canvas);
             Imgproc.cvtColor(Canvas, Canvas, Imgproc.COLOR_RGB2BGRA);
 
-            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName + "_Final.jpg", Canvas);
+            //Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName + "_Final.jpg", Canvas);
             //Imgcodecs.imwrite("D:\\Thesis\\Outputs\\OldBrushStroke_" + imageName +"_ColorChanged.jpg", Canvas);
 
             texture.Apply();
 
             Sprite sprite = Sprite.Create(texture, new UnityEngine.Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
-            image.sprite = sprite;
-            screenshot = sprite;
+
+            string imageNameToBeRendered = "Image" + resultMan.getBrushStrokeIndex().ToString() + "_";
+
+            if (resultMan.getSelectedPalette() == 0)
+                imageNameToBeRendered += "Pre";
+            else if (resultMan.getSelectedPalette() == 1)
+                imageNameToBeRendered += "Post";
+            else if (resultMan.getSelectedPalette() == 2)
+                imageNameToBeRendered += "Final";
+
+            for(int i = 0; i < images.Length; i++)
+            {
+                if (imageNameToBeRendered.Contains(images[i].name))
+                {
+                    images[i].sprite = sprite;
+                    images[i].enabled = true;
+                    images[i].GetComponentInChildren<ImageParameters>().setBrushStrokeOpacities(resultMan.getBrushValues());
+                    images[i].GetComponentInChildren<ImageParameters>().setColorPaletteSelected(resultMan.getSelectedPalette());
+                    images[i].GetComponentInChildren<ImageParameters>().setBrushStrokeIndex(resultMan.getBrushStrokeIndex());
+                    resultMan.setCurrentDisplayedImageName(images[i].name);
+                }
+            }
+
+            //screenshot = sprite;
             arcamera.SetActive(false);
+
+            resultMan.setIsRendered(true);
+            resultMan.resetColorPaletteButtons();
+
+/*            Mat grad_x = new Mat();
+            Mat grad_y = new Mat();
+            Mat abs_grad_x = new Mat();
+            Mat abs_grad_y = new Mat();
+            Mat dst = new Mat();
+            Mat final = new Mat();
+
+            Utils.texture2DToMat(texture, TextureMat);
+
+            Imgproc.GaussianBlur(TextureMat, TextureMat, new Size(3, 3), 0, 0);
+            Imgproc.cvtColor(TextureMat, dst, Imgproc.COLOR_RGBA2GRAY);
+
+            Imgproc.Sobel(dst, grad_x, CvType.CV_16S, 1, 0, 3, 1, 0);
+            Core.convertScaleAbs(grad_x, abs_grad_x);
+
+            Imgproc.Sobel(dst, grad_y, CvType.CV_16S, 0, 1, 3, 1, 0);
+            Core.convertScaleAbs(grad_y, abs_grad_y);
+
+            Core.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, final);
+
+            Imgcodecs.imwrite("D:\\Thesis\\Outputs\\Final_Edge.jpg", final);*/
         }
     }
     private float diff(double[] a, double[] b)
@@ -385,11 +471,16 @@ public class PaintScene : MonoBehaviour
         if (!path.Equals(""))
             File.Delete(path);
         path = "";
-        image.enabled = false;
+        for(int i = 0; i < images.Length; i++)
+        {
+            images[i].enabled = false;
+            images[i].sprite = null;
+        }
         backButton.SetActive(false);
         paintButton.SetActive(true);
         mainMenu.SetActive(true);
         objectMan.reset();
+        resultMan.reset();
         arcamera.SetActive(true);
     }
 
@@ -413,7 +504,7 @@ public class PaintScene : MonoBehaviour
     {
         int n = 0;
 
-        if (color_palette_index == 0)
+        if (resultMan.getSelectedPalette() == 0)
             n = 10;
         else
             n = 9;
@@ -506,7 +597,7 @@ public class PaintScene : MonoBehaviour
 
         //return palettes[0];
 
-        if (color_palette_index == 1)
+        if (resultMan.getSelectedPalette() == 1)
         {
             Color[] palette = new Color[9];
             palette[0] = new Color(0.8627f, 0.8588f, 0.8392f); //LeadWhite;
@@ -521,7 +612,7 @@ public class PaintScene : MonoBehaviour
             return palette;
         }
 
-        else if (color_palette_index == 2)
+        else if (resultMan.getSelectedPalette() == 2)
         {
             Color[] palette = new Color[9];
             palette[0] = new Color(0.75f, 0.75f, 0.75f); //Silver;
@@ -614,5 +705,132 @@ public class PaintScene : MonoBehaviour
 
         return Vector3.Distance(x, y);
         */
+    }
+
+    public void applyOptions()
+    {
+        string iName = "";
+        for(int i = 0; i < images.Length; i++)
+        {
+            if (resultMan.getCurrentDisplayedImageName().Contains(images[i].name))
+            {
+                //if(images[i].GetComponentInChildren<ImageParameters>().getBrushStrokeIndex() != resultMan.getBrushStrokeIndex())
+                //{
+                iName = "Image" + resultMan.getBrushStrokeIndex().ToString() + "_";
+                if (resultMan.getSelectedPalette() == 0)
+                    iName += "Pre";
+                else if (resultMan.getSelectedPalette() == 1)
+                    iName += "Post";
+                else if (resultMan.getSelectedPalette() == 2)
+                    iName += "Final";
+                //}
+                for(int j = 0; j < images.Length; j++)
+                {
+                    if (iName.Contains(images[j].name))
+                    {
+                        if (images[j].sprite == null)
+                        {
+                            renderImage(j);
+                        }
+                        else
+                        {
+                            bool hasChanges = false;
+                            for (int k = 0; k < 6; k++)
+                            {
+                                if (images[j].GetComponentInChildren<ImageParameters>().getBrushStrokeOpacities()[k] != resultMan.getBrushValues()[k])
+                                {
+                                    hasChanges = true;
+                                    break;
+                                }
+                            }
+                            if (hasChanges)
+                            {
+                                renderImage(j);
+                            }
+                            else
+                            {
+                                unDisplayImages();
+                                images[j].enabled = true;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        resultMan.renderedApply();
+    }
+
+    public void cancelOptions()
+    {
+        for(int i = 0; i < images.Length; i++)
+        {
+            if (resultMan.getCurrentDisplayedImageName().Contains(images[i].name))
+            {
+                resultMan.renderedReset(images[i].GetComponentInChildren<ImageParameters>().getBrushStrokeOpacities(),
+                    images[i].GetComponentInChildren<ImageParameters>().getBrushStrokeIndex(),
+                    images[i].GetComponentInChildren<ImageParameters>().getColorPaletteSelected());
+            }
+        }
+    }
+    
+    private void unDisplayImages()
+    {
+        for(int i = 0; i < images.Length; i++)
+        {
+            images[i].enabled = false;
+        }
+    }
+    
+    private void renderImage(int j)
+    {
+        byte[] colorChangedPic = null;
+        if (resultMan.getSelectedPalette() == 0)
+        {
+            if (pre1886ColorChangedTexture == null)
+            {
+                pre1886ColorChangedTexture = changeColor(unalteredScene, centers);
+            }
+            colorChangedPic = pre1886ColorChangedTexture.EncodeToJPG();
+        }
+        else if (resultMan.getSelectedPalette() == 1)
+        {
+            if (post1886ColorChangedTexture == null)
+            {
+                post1886ColorChangedTexture = changeColor(unalteredScene, centers);
+            }
+            colorChangedPic = post1886ColorChangedTexture.EncodeToJPG();
+        }
+        else if (resultMan.getSelectedPalette() == 2)
+        {
+            if (finalYearsColorChangedTexture == null)
+            {
+                finalYearsColorChangedTexture = changeColor(unalteredScene, centers);
+            }
+            colorChangedPic = finalYearsColorChangedTexture.EncodeToJPG();
+        }
+
+
+        string image64 = Convert.ToBase64String(colorChangedPic);
+
+        // Copy this structure to add in change color
+        clientSocket = new ClientSocketScript(image64, "GetBrushStrokes", resultMan.getBrushStrokeIndex(), resultMan.getBrushValues());
+        clientSocket.Start();
+        while (clientSocket.getResponse() == null)
+        {
+            clientSocket.Update();
+        }
+
+        byte[] bytes = Convert.FromBase64String(clientSocket.getResponse());
+        clientSocket.Stop();
+        Texture2D texture = new Texture2D(1, 1);
+        texture.LoadImage(bytes);
+        texture.Apply();
+        Sprite sprite = Sprite.Create(texture, new UnityEngine.Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
+        images[j].sprite = sprite;
+        unDisplayImages();
+        images[j].enabled = true;
+        resultMan.setCurrentDisplayedImageName(images[j].name);
+        this.loadingScreen.SetActive(false);
     }
 }

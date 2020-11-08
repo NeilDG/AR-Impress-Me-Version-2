@@ -5,7 +5,7 @@ import cairo
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage
-from style import Style, Impressionist, Expressionist, ColoristWash, Pointillist
+from style import Style, Impressionist
 
 
 class Painter:
@@ -24,9 +24,11 @@ class Painter:
 
         for i, radius in enumerate(self.style.brush_sizes):
             ref_img = src_img.filter(ImageFilter.GaussianBlur(radius=self.style.blur_filter*radius))
+            #blurred_image_directory = 'D:\\Thesis\\Outputs\\blurredImage' + str(i) + '.jpg'
+            #ref_img.save(blurred_image_directory)
             self.paintLayer(ref_img, radius)
-            #self.canvas.write_to_png(
-            #   os.path.join(self.output_dir, '%s_%s_%d.png' % (self.style.__class__.__name__, "output", i)))
+            directory = 'D:\\Thesis\\Outputs\\' + str(i) + '.png'
+            self.canvas.write_to_png(directory)
         return self.canvas
 
     def paintLayer(self, ref_img, radius):
@@ -58,7 +60,7 @@ class Painter:
         print("radius=%d : stroke %d" % (radius, cnt))
 
         for s in S:
-            self.context.set_line_width(max(self.context.device_to_user_distance(2 * radius, 2 * radius)))
+            self.context.set_line_width(max(self.context.device_to_user_distance(radius, radius)))
             stroke_color = self.ref_nparray[s[0]]/255
             self.context.set_source_rgb(stroke_color[0], stroke_color[1], stroke_color[2])
 
