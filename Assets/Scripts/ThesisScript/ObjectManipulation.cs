@@ -117,9 +117,18 @@ public class ObjectManipulation : MonoBehaviour
         string name = EventSystem.current.currentSelectedGameObject.name;
         for(int x = 0; x < models.Length; x++) {
             if (name.Contains(models[x].name)) {
-                models[x].SetActive(true);
-                models[x].transform.localPosition = new Vector3(0, 0, 0);
-                models[x].transform.localRotation = new Quaternion();
+                if (name.Contains("Lucy"))
+                {
+                    models[x].SetActive(true);
+                    models[x].transform.localPosition = new Vector3(0, 0, 0);
+                    models[x].transform.localRotation = new Quaternion(0, 180, 0, 0);
+                }
+                else
+                {
+                    models[x].SetActive(true);
+                    models[x].transform.localPosition = new Vector3(0, 0, 0);
+                    models[x].transform.localRotation = new Quaternion();
+                }
             }
         }
         backButton.SetActive(false);
