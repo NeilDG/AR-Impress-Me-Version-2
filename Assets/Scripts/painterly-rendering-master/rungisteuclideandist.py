@@ -1,8 +1,8 @@
 import numpy
 import os
 
-path = "D:\Thesis\CapturedUnalteredScene"
-path1 = r"D:\Thesis\CapturedUnalteredScene\GistOutput"
+path = "CapturedUnalteredScene"
+path1 = r"GistOutput"
 
 centroidOne = [0.0451056, 0.0896504, 0.0984765, 0.0660195, 0.0344274, 0.0703501, 0.0810796, 0.0805062, 0.0402381,
                    0.0651527, 0.0716088, 0.070411, 0.0441306, 0.0637218, 0.0678075, 0.0636398, 0.0379922, 0.0791748,

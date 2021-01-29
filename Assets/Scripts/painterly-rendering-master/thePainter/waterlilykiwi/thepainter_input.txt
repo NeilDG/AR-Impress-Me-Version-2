@@ -1,0 +1,17 @@
+20210121_211818.jpg
+../texture/canvas02/rgb.png
+../texture/canvas02/bumpity.png
+6
+128 1 1.0 50.0 0.5 0
+64 1 1.0 50.0 0.5 0
+32 1 1.0 50.0 0.5 0
+8 0.5 1.0 50.0 0.5 0
+4 0.2 1.0 50.0 0.5 0
+2 0.1 1.0 50.0 0.5 0
+2
+../texture/brush01/0.png
+../texture/brush01/0.png
+../texture/brush01_halfwidth/0.png
+../texture/brush01_halfwidth/0.png
+RenderedImage_0.jpg
+canvas_bumpity_image.png

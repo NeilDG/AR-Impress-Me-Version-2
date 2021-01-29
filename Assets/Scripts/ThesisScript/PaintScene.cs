@@ -168,16 +168,16 @@ public class PaintScene : MonoBehaviour
             if (Screen.orientation == ScreenOrientation.Portrait)
             {
                 int width = (int)Math.Round(480 * aspectRatio);
-                texture = ScaleTexture(texture, width, 480);
-                unalteredScene = ScaleTexture(texture, width, 480);
-                orgTexture = ScaleTexture(orgTexture, width, 480);
+                texture = ScaleTexture(texture, texture.width, texture.height);
+                unalteredScene = ScaleTexture(texture, texture.width, texture.height);
+                orgTexture = ScaleTexture(orgTexture, texture.width, texture.height);
             }
             else
             {
                 int height = (int)Math.Round(480 / aspectRatio);
-                texture = ScaleTexture(texture, 480, height);
-                unalteredScene = ScaleTexture(texture, 480, height);
-                orgTexture = ScaleTexture(orgTexture, 480, height);
+                texture = ScaleTexture(texture, texture.width, texture.height);
+                unalteredScene = ScaleTexture(texture, texture.width, texture.height);
+                orgTexture = ScaleTexture(orgTexture, texture.width, texture.height);
             }
 
             //OPENCV Color Picker
@@ -434,17 +434,19 @@ public class PaintScene : MonoBehaviour
             resultMan.setIsRendered(true);
             resultMan.resetColorPaletteButtons();
 
-/*            Mat grad_x = new Mat();
+            /*Mat grad_x = new Mat();
             Mat grad_y = new Mat();
             Mat abs_grad_x = new Mat();
             Mat abs_grad_y = new Mat();
             Mat dst = new Mat();
             Mat final = new Mat();
+            Mat sobelMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
 
-            Utils.texture2DToMat(texture, TextureMat);
 
-            Imgproc.GaussianBlur(TextureMat, TextureMat, new Size(3, 3), 0, 0);
-            Imgproc.cvtColor(TextureMat, dst, Imgproc.COLOR_RGBA2GRAY);
+            Utils.texture2DToMat(texture, sobelMat);
+
+            Imgproc.GaussianBlur(sobelMat, sobelMat, new Size(3, 3), 0, 0);
+            Imgproc.cvtColor(sobelMat, dst, Imgproc.COLOR_RGBA2GRAY);
 
             Imgproc.Sobel(dst, grad_x, CvType.CV_16S, 1, 0, 3, 1, 0);
             Core.convertScaleAbs(grad_x, abs_grad_x);
@@ -468,6 +470,7 @@ public class PaintScene : MonoBehaviour
 
     public void back()
     {
+        resultMan.setIsRendered(false);
         if (!path.Equals(""))
             File.Delete(path);
         path = "";

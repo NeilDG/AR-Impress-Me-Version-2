@@ -171,6 +171,9 @@ public class ResultManipulation : MonoBehaviour
         if (!isRendered)
         {
             paintButton.SetActive(true);
+            secondCancelButton.SetActive(false);
+            applyButton2.SetActive(false);
+            optionButton.SetActive(false);
         }
         else
         {

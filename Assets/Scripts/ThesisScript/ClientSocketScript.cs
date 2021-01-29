@@ -96,6 +96,7 @@ public class NetMqListener
             else
                 message = _message + "," + _picture + "," + _brushStrokeIndex + ',' + _brushValues;
             
+            //reqSocket.Connect("tcp://192.168.0.6:12345");
             reqSocket.Connect("tcp://localhost:12345");
             reqSocket.SendFrame(message);
             
